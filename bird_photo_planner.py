@@ -15,7 +15,28 @@ import webbrowser
 import urllib.request
 import urllib.error
 import sys
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
+
+# Central Time offset (UTC-6 standard, UTC-5 daylight)
+# We detect DST automatically
+def now_central():
+    """Return current datetime in US Central Time, DST-aware."""
+    import time as _time
+    utc_now = datetime.now(timezone.utc)
+    # US DST: second Sunday in March through first Sunday in November
+    year = utc_now.year
+    # Second Sunday in March
+    march1 = datetime(year, 3, 1)
+    dst_start = march1 + timedelta(days=(6 - march1.weekday()) % 7 + 7)
+    dst_start = dst_start.replace(hour=2, tzinfo=timezone.utc)
+    # First Sunday in November
+    nov1 = datetime(year, 11, 1)
+    dst_end = nov1 + timedelta(days=(6 - nov1.weekday()) % 7)
+    dst_end = dst_end.replace(hour=2, tzinfo=timezone.utc)
+    if dst_start <= utc_now < dst_end:
+        return utc_now + timedelta(hours=-5)   # CDT
+    else:
+        return utc_now + timedelta(hours=-6)   # CST
 
 # ── Location ──────────────────────────────────────────────────────────────────
 LAT = 42.9136
@@ -283,7 +304,31 @@ def build_html(weather_json):
     # Sort chronologically (soonest first)
     top_picks.sort(key=lambda r: r['dt'])
 
-    generated = datetime.now().strftime("%A %b %-d, %Y at %-I:%M %p CT")
+    # Current Central Time — used to filter out sessions that have already passed
+    ct_now = now_central()
+    now_ds = ct_now.strftime("%Y-%m-%d")
+    now_hr = ct_now.hour
+
+    # Remove sessions that are in the past (same day but hour already gone, or earlier days)
+    top_picks = [
+        r for r in top_picks
+        if r['ds'] > now_ds or (r['ds'] == now_ds and r['hour'] >= now_hr)
+    ]
+
+    # If we filtered some out, backfill from candidates to keep up to 4 cards
+    if len(top_picks) < 4:
+        existing_keys = {f"{r['ds']}-{r['analysis']['period']}" for r in top_picks}
+        for c in candidates:
+            if len(top_picks) >= 4: break
+            key = f"{c['ds']}-{c['analysis']['period']}"
+            if key in existing_keys: continue
+            # Only future sessions
+            if c['ds'] < now_ds or (c['ds'] == now_ds and c['hour'] < now_hr): continue
+            existing_keys.add(key)
+            top_picks.append(c)
+        top_picks.sort(key=lambda r: r['dt'])
+
+    generated = ct_now.strftime("%A %b %-d, %Y at %-I:%M %p CT")
 
     # ── CSS & HTML shell ──────────────────────────────────────────────────────
     css = """
