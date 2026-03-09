@@ -1,0 +1,23 @@
+name: Update Forecast
+
+on:
+  schedule:
+    - cron: '0 5,11,17,23 * * *'  # Runs at midnight, 6am, noon, 6pm CT
+  workflow_dispatch:  # Allows manual trigger from GitHub
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run forecast script
+        run: python3 bird_photo_planner.py --export
+
+      - name: Commit and push updated forecast
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add index.html
+          git diff --staged --quiet || git commit -m "Update forecast"
+          git push
