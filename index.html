@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lake Koshkonong Bird Photography Planner</title>
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Lake Koshkonong Bird Photography Planner v2</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-    :root{--gold:#c9a84c;--amber:#e8b84b;--pale:#f2e8d5;--mist:#8fa3b1;
-      --good:#27ae60;--warn:#e67e22;--red:#c0392b;--bg:#0f1420;
-      --card:#161d2e;--border:rgba(201,168,76,0.2);--text:#e8e0d0;--sub:#8fa3b1;}
+    :root{--gold:#c9a84c;--pale:#f2e8d5;--sub:#8fa3b1;--good:#27ae60;--warn:#e67e22;--red:#c0392b;
+      --bg:#0f1420;--card:#161d2e;--border:rgba(201,168,76,0.2);--text:#e8e0d0;
+      --prime:#a78bfa;--prime-bg:rgba(167,139,250,.12);}
     *{margin:0;padding:0;box-sizing:border-box;}
     body{background:var(--bg);color:var(--text);font-family:'Source Code Pro',monospace;min-height:100vh;}
-    .sky-bg{position:fixed;top:0;left:0;right:0;bottom:0;
+    .sky-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
       background:radial-gradient(ellipse at 20% 30%,rgba(201,168,76,.06) 0%,transparent 50%),
         radial-gradient(ellipse at 80% 70%,rgba(61,107,125,.08) 0%,transparent 50%),
-        linear-gradient(180deg,#0a0e18 0%,#0f1420 40%,#111828 100%);z-index:0;pointer-events:none;}
+        radial-gradient(ellipse at 65% 5%,rgba(167,139,250,.05) 0%,transparent 45%),
+        linear-gradient(180deg,#0a0e18 0%,#0f1420 40%,#111828 100%);}
     .content{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:24px 20px 60px;}
     header{text-align:center;padding:40px 0 32px;border-bottom:1px solid var(--border);margin-bottom:32px;}
     .loc-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(201,168,76,.1);
@@ -24,88 +25,122 @@
       color:var(--pale);line-height:1.1;margin-bottom:8px;}
     h1 em{font-style:italic;color:var(--gold);}
     .subtitle{font-size:12px;color:var(--sub);letter-spacing:.12em;text-transform:uppercase;}
-    .legend{display:flex;gap:24px;justify-content:center;margin:20px 0 0;flex-wrap:wrap;}
-    .legend-item{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--sub);letter-spacing:.06em;}
+    .legend{display:flex;gap:20px;justify-content:center;margin:20px 0 0;flex-wrap:wrap;}
+    .legend-item{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--sub);}
     .legend-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;}
     #status{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:14px 20px;
-      margin-bottom:28px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:10px;}
+      margin-bottom:28px;font-size:12px;color:var(--sub);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
     .status-dot{width:8px;height:8px;background:var(--good);border-radius:50%;flex-shrink:0;}
-    .section-label{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+    .sl{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
       margin-bottom:14px;display:flex;align-items:center;gap:10px;}
-    .section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-    .top-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;margin-bottom:40px;}
-    .pick-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;
-      position:relative;overflow:hidden;transition:transform .2s,border-color .2s;}
-    .pick-card:hover{transform:translateY(-2px);border-color:rgba(201,168,76,.4);}
-    .pick-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;}
-    .pick-card.excellent::before{background:linear-gradient(90deg,#27ae60,#2ecc71);}
-    .pick-card.good::before{background:linear-gradient(90deg,var(--gold),var(--amber));}
-    .pick-card.fair::before{background:linear-gradient(90deg,var(--warn),#f39c12);}
-    .pick-card.eagle::before{background:linear-gradient(90deg,#8e44ad,#3498db);}
-    .pick-rank{position:absolute;top:16px;right:16px;font-family:'Playfair Display',serif;
-      font-size:36px;color:rgba(201,168,76,.15);font-weight:700;line-height:1;}
-    .pick-badge{display:inline-block;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
-      padding:2px 8px;border-radius:3px;margin-bottom:10px;font-weight:500;}
-    .badge-excellent{background:rgba(39,174,96,.2);color:#2ecc71;}
-    .badge-good{background:rgba(201,168,76,.2);color:var(--gold);}
-    .badge-fair{background:rgba(230,126,34,.2);color:var(--warn);}
+    .sl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+    /* Picks */
+    .top-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:40px;}
+    .pick-card{background:var(--card);border:1px solid var(--border);border-radius:10px;
+      padding:20px;position:relative;overflow:hidden;}
+    .pick-card.excellent{border-color:rgba(39,174,96,.35);}
+    .pick-card.good{border-color:rgba(201,168,76,.35);}
+    .pick-card.eagle{border-color:rgba(142,68,173,.4);}
+    .pick-card.prime{border-color:rgba(167,139,250,.5);background:linear-gradient(135deg,#161d2e,#1a1535);}
+    .pick-rank{position:absolute;top:12px;right:14px;font-size:11px;color:var(--sub);}
+    .pick-badge{display:inline-block;font-size:10px;font-weight:600;letter-spacing:.08em;
+      text-transform:uppercase;padding:3px 10px;border-radius:20px;margin-bottom:12px;}
+    .badge-excellent{background:rgba(39,174,96,.15);color:#2ecc71;}
+    .badge-good{background:rgba(201,168,76,.15);color:var(--gold);}
+    .badge-fair{background:rgba(230,126,34,.15);color:var(--warn);}
     .badge-eagle{background:rgba(142,68,173,.2);color:#9b59b6;}
-    .pick-time{font-family:'Playfair Display',serif;font-size:20px;color:var(--pale);margin-bottom:4px;}
-    .pick-date{font-size:11px;color:var(--sub);margin-bottom:14px;letter-spacing:.06em;}
-    .pick-metrics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
-    .metric{background:rgba(255,255,255,.03);border-radius:6px;padding:8px 10px;}
-    .metric-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:3px;}
-    .metric-value{font-size:14px;color:var(--pale);font-weight:500;}
-    .good-val{color:#2ecc71;} .warn-val{color:var(--warn);} .bad-val{color:var(--red);}
-    .score-bar-wrap{margin-bottom:10px;}
-    .score-bar-label{display:flex;justify-content:space-between;font-size:10px;color:var(--sub);
-      margin-bottom:4px;letter-spacing:.06em;text-transform:uppercase;}
-    .score-bar{height:4px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;}
-    .score-bar-fill{height:100%;border-radius:2px;}
-    .pick-notes{font-size:11px;color:var(--sub);line-height:1.5;border-top:1px solid var(--border);
-      padding-top:10px;margin-top:2px;}
-    .pick-notes strong{color:var(--gold);font-weight:500;}
-    .day-block{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:12px;overflow:hidden;}
+    .badge-prime{background:var(--prime-bg);color:var(--prime);}
+    .pick-time{font-size:22px;font-family:'Playfair Display',serif;color:var(--pale);
+      font-weight:400;text-transform:capitalize;line-height:1.2;}
+    .pick-date{font-size:22px;font-family:'Playfair Display',serif;color:var(--pale);
+      font-weight:400;line-height:1.2;margin-bottom:2px;}
+    .pick-sun{font-size:11px;color:var(--sub);margin:4px 0 14px;letter-spacing:.03em;}
+    .sb-wrap{margin-bottom:14px;}
+    .sb-lbl{display:flex;justify-content:space-between;font-size:11px;color:var(--sub);margin-bottom:5px;}
+    .sb{height:4px;background:rgba(255,255,255,.06);border-radius:2px;}
+    .sb-fill{height:100%;border-radius:2px;}
+    .pm{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+    .m{background:rgba(0,0,0,.2);border-radius:6px;padding:8px 10px;}
+    .ml{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--sub);margin-bottom:2px;}
+    .mv{font-size:13px;color:var(--text);}
+    .gv{color:#2ecc71;} .wv{color:var(--warn);} .bv{color:var(--red);}
+    .pick-notes{font-size:11px;color:var(--sub);font-style:italic;line-height:1.5;margin-top:8px;}
+    .sol-tag{display:inline-block;background:rgba(167,139,250,.12);color:var(--prime);
+      font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;border:1px solid rgba(167,139,250,.2);}
+
+    /* Day blocks */
+    .day-block{background:var(--card);border:1px solid var(--border);border-radius:10px;
+      margin-bottom:10px;overflow:hidden;}
     .day-header{display:flex;align-items:center;gap:16px;padding:14px 20px;cursor:pointer;
-      user-select:none;transition:background .15s;}
+      transition:background .15s;user-select:none;}
     .day-header:hover{background:rgba(255,255,255,.02);}
-    .day-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--pale);min-width:130px;}
-    .day-date-sub{font-size:11px;color:var(--sub);}
-    .day-summary{flex:1;display:flex;gap:12px;flex-wrap:wrap;}
-    .day-pill{font-size:10px;padding:3px 10px;border-radius:10px;letter-spacing:.06em;}
-    .day-expand{font-size:18px;color:var(--sub);transition:transform .2s;margin-left:auto;flex-shrink:0;}
-    .day-expand.open{transform:rotate(180deg);}
+    .day-name{font-family:'Playfair Display',serif;font-size:18px;color:var(--pale);font-weight:400;}
+    .day-sub{font-size:10px;color:var(--sub);letter-spacing:.08em;margin-top:2px;}
+    .day-sum{display:flex;gap:8px;flex-wrap:wrap;flex:1;justify-content:flex-end;align-items:center;}
+    .pill{font-size:10px;padding:3px 9px;border-radius:10px;letter-spacing:.04em;}
+    .dexp{font-size:18px;color:var(--sub);transition:transform .2s;margin-left:auto;flex-shrink:0;}
+    .dexp.open{transform:rotate(180deg);}
     .day-content{display:none;border-top:1px solid var(--border);}
     .day-content.open{display:block;}
-    .hour-row{display:grid;grid-template-columns:80px 80px 100px 90px 80px 1fr;
+    .hr-row{display:grid;grid-template-columns:80px 90px 100px 90px 80px 1fr;
       align-items:center;gap:12px;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,.03);
       font-size:12px;transition:background .1s;}
-    .hour-row:last-child{border-bottom:none;}
-    .hour-row:hover{background:rgba(255,255,255,.02);}
-    .hour-row.highlighted{background:rgba(201,168,76,.06);border-left:3px solid var(--gold);}
-    .hour-row.eagle-hour{background:rgba(142,68,173,.06);border-left:3px solid #9b59b6;}
-    .hour-row.session-start{background:rgba(39,174,96,.06);border-left:3px solid var(--good);}
-    .score-chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;
-      border-radius:4px;letter-spacing:.04em;}
-    .chip-exc{background:rgba(39,174,96,.2);color:#2ecc71;}
-    .chip-good{background:rgba(201,168,76,.2);color:var(--gold);}
-    .chip-fair{background:rgba(230,126,34,.2);color:var(--warn);}
-    .chip-poor{background:rgba(255,255,255,.05);color:var(--sub);}
-    .chip-eagle{background:rgba(142,68,173,.2);color:#9b59b6;}
-    .wind-good{color:#2ecc71;} .wind-warn{color:var(--warn);} .wind-bad{color:var(--red);}
+    .hr-row:last-child{border-bottom:none;}
+    .hr-row:hover{background:rgba(255,255,255,.02);}
+    .hr-row.hl{background:rgba(201,168,76,.06);border-left:3px solid var(--gold);}
+    .hr-row.eg{background:rgba(142,68,173,.06);border-left:3px solid #9b59b6;}
+    .hr-row.pr{background:rgba(167,139,250,.07);border-left:3px solid var(--prime);}
+    .hr-row.exc{background:rgba(39,174,96,.06);border-left:3px solid var(--good);}
+    .chip{display:inline-block;font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+    .c-exc{background:rgba(39,174,96,.2);color:#2ecc71;}
+    .c-gd{background:rgba(201,168,76,.2);color:var(--gold);}
+    .c-fr{background:rgba(230,126,34,.2);color:var(--warn);}
+    .c-po{background:rgba(255,255,255,.05);color:var(--sub);}
+    .c-eg{background:rgba(142,68,173,.2);color:#9b59b6;}
+    .c-pr{background:var(--prime-bg);color:var(--prime);}
+    .wg{color:#2ecc71;} .ww{color:var(--warn);} .wb{color:var(--red);}
     .hr-notes{color:var(--sub);font-size:11px;font-style:italic;}
     .blind-banner{background:linear-gradient(135deg,rgba(39,174,96,.1),rgba(201,168,76,.1));
       border:1px solid rgba(39,174,96,.3);border-radius:8px;padding:12px 20px;margin:10px 20px;
-      font-size:11px;color:#2ecc71;display:flex;align-items:center;gap:10px;}
-    .hour-header{display:grid;grid-template-columns:80px 80px 100px 90px 80px 1fr;gap:12px;
+      font-size:11px;color:#2ecc71;display:flex;align-items:center;gap:8px;}
+    .sol-banner{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.2);
+      border-radius:8px;padding:10px 20px;margin:8px 20px 0;font-size:11px;
+      color:var(--prime);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .hr-header{display:grid;grid-template-columns:80px 90px 100px 90px 80px 1fr;gap:12px;
       padding:8px 20px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
       color:var(--sub);background:rgba(0,0,0,.2);}
-    .key-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:40px;}
-    .key-card{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:11px;}
-    .key-card h4{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:8px;font-weight:400;}
-    .key-card li{color:var(--sub);margin-bottom:4px;line-height:1.5;list-style:none;padding-left:14px;position:relative;}
-    .key-card li::before{content:'·';position:absolute;left:4px;color:var(--gold);}
-    footer{text-align:center;font-size:10px;color:rgba(143,163,177,.5);letter-spacing:.08em;
+    .kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:40px;}
+    .kc{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:16px;font-size:11px;}
+    .kc h4{font-family:'Playfair Display',serif;font-size:14px;color:var(--gold);margin-bottom:8px;font-weight:400;}
+    .kc li{color:var(--sub);margin-bottom:4px;line-height:1.5;list-style:none;padding-left:14px;position:relative;}
+    .kc li::before{content:'·';position:absolute;left:4px;color:var(--gold);}
+
+    /* Haikubox */
+    .hb-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:40px;}
+    @media(max-width:680px){.hb-grid{grid-template-columns:1fr;}}
+    .hb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;}
+    .hb-card h3{font-family:'Playfair Display',serif;font-size:16px;color:var(--pale);
+      font-weight:400;margin-bottom:14px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+    .hb-meta{font-family:'Source Code Pro';font-size:10px;color:var(--sub);}
+    .sp-group{margin-bottom:14px;}
+    .sp-group:last-child{margin-bottom:0;}
+    .sp-group-label{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--sub);
+      margin-bottom:6px;padding-bottom:4px;border-bottom:1px solid rgba(255,255,255,.06);
+      display:flex;align-items:center;gap:6px;}
+    .sp-group-icon{font-size:11px;}
+    .sp-row{display:flex;align-items:center;padding:4px 0;font-size:12px;gap:8px;}
+    .sp-rank{font-size:10px;color:var(--sub);width:18px;text-align:right;flex-shrink:0;}
+    .sp-name{color:var(--text);white-space:nowrap;flex-shrink:0;min-width:130px;font-size:11px;}
+    .sp-bar-wrap{flex:1;height:5px;background:rgba(255,255,255,.06);border-radius:3px;overflow:hidden;}
+    .sp-bar{height:100%;border-radius:3px;}
+    .sp-cnt{color:var(--sub);font-size:10px;white-space:nowrap;width:24px;text-align:right;flex-shrink:0;}
+    .sp-ago{color:var(--gold);font-size:10px;white-space:nowrap;flex-shrink:0;min-width:42px;text-align:right;}
+    .act-chart{display:flex;align-items:flex-end;gap:2px;height:80px;margin-top:12px;}
+    .act-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;}
+    .act-bar{width:100%;border-radius:2px 2px 0 0;min-height:2px;}
+    .act-lbl{font-size:8px;color:var(--sub);}
+    footer{text-align:center;font-size:10px;color:rgba(143,163,177,.4);letter-spacing:.06em;
       padding-top:20px;border-top:1px solid var(--border);}
     </style>
 </head>
@@ -113,186 +148,583 @@
 <div class="sky-bg"></div>
 <div class="content">
   <header>
-    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson, WI · West-Facing Deck</div>
+    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v2.0</div>
     <h1>Bird Photography<br><em>Session Planner</em></h1>
-    <p class="subtitle">7-Day Forecast · Wind · Light · Eagle Conditions</p>
+    <p class="subtitle">7-Day Forecast · Wind · Light · Solunar Tables · Eagle · Haikubox Live</p>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div>Excellent session</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#c9a84c"></div>Good session</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>Fair session</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>Eagle watch potential</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#a78bfa"></div>🌕 Prime session</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2ecc71"></div>Excellent</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#c9a84c"></div>Good</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#e67e22"></div>Fair</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#9b59b6"></div>Eagle watch</div>
     </div>
   </header>
   <div id="status">
     <div class="status-dot"></div>
-    Live data loaded · 7-day forecast for Lake Koshkonong · Generated Tuesday Mar 10, 2026 at 2:26 PM CT
+    Live data · 7-day forecast · Solunar tables computed · Haikubox live · Generated Tuesday Mar 10, 2026 at 6:52 PM CT
   </div>
-  <div class="section-label">Best upcoming sessions</div>
+  <div class="sl">Best upcoming sessions</div>
   <div class="top-picks">
         <div class="pick-card good">
           <div class="pick-rank">1</div>
           <div class="pick-badge badge-good">Good</div>
-          <div class="pick-time">8:00 AM — morning</div>
-          <div class="pick-date">Thursday, Mar 12&nbsp;&nbsp;🌅 7:12 AM &nbsp; 🌇 6:58 PM</div>
-          <div class="score-bar-wrap">
-            <div class="score-bar-label"><span>Photo Score</span>
-              <span style="color:#c9a84c">60/100</span></div>
-            <div class="score-bar">
-              <div class="score-bar-fill" style="width:60%;background:#c9a84c"></div>
-            </div>
+          <div class="pick-date">Tuesday, Mar 10</div>
+          <div class="pick-time">7:00 PM — evening</div>
+          <div class="pick-sun">🌅 7:15 AM &nbsp; 🌇 6:55 PM</div>
+          <div class="sb-wrap">
+            <div class="sb-lbl"><span>Photo Score</span><span style="color:#c9a84c">56/100</span></div>
+            <div class="sb"><div class="sb-fill" style="width:56%;background:#c9a84c"></div></div>
           </div>
-          <div class="pick-metrics">
-            <div class="metric"><div class="metric-label">Effective Wind</div>
-              <div class="metric-value warn-val">8.0 mph</div></div>
-            <div class="metric"><div class="metric-label">Raw Wind</div>
-              <div class="metric-value">8 mph WNW</div></div>
-            <div class="metric"><div class="metric-label">Cloud Cover</div>
-              <div class="metric-value good-val">6%</div></div>
-            <div class="metric"><div class="metric-label">Session Length</div>
-              <div class="metric-value ">1+ hr</div></div>
+          <div class="pm">
+            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">4.2 mph</div></div>
+            <div class="m"><div class="ml">Raw Wind</div><div class="mv">14 mph NE</div></div>
+            <div class="m"><div class="ml">Cloud Cover</div><div class="mv ">100%</div></div>
+            <div class="m"><div class="ml">Session Length</div><div class="mv ">1+ hr</div></div>
           </div>
-          <div class="pick-notes">Exposed (westerly wind) · 🌅 Golden hour</div>
+          <div class="sol-tag">🌕 Moon underfoot</div>
+          <div class="pick-notes">Light breeze · Sheltered (easterly wind) · Overcast · Civil twilight — soft light</div>
         </div>
         <div class="pick-card good">
           <div class="pick-rank">2</div>
           <div class="pick-badge badge-good">Good</div>
+          <div class="pick-date">Wednesday, Mar 11</div>
           <div class="pick-time">7:00 PM — evening</div>
-          <div class="pick-date">Thursday, Mar 12&nbsp;&nbsp;🌅 7:12 AM &nbsp; 🌇 6:58 PM</div>
-          <div class="score-bar-wrap">
-            <div class="score-bar-label"><span>Photo Score</span>
-              <span style="color:#c9a84c">66/100</span></div>
-            <div class="score-bar">
-              <div class="score-bar-fill" style="width:66%;background:#c9a84c"></div>
-            </div>
+          <div class="pick-sun">🌅 7:13 AM &nbsp; 🌇 6:56 PM</div>
+          <div class="sb-wrap">
+            <div class="sb-lbl"><span>Photo Score</span><span style="color:#c9a84c">63/100</span></div>
+            <div class="sb"><div class="sb-fill" style="width:63%;background:#c9a84c"></div></div>
           </div>
-          <div class="pick-metrics">
-            <div class="metric"><div class="metric-label">Effective Wind</div>
-              <div class="metric-value good-val">2.4 mph</div></div>
-            <div class="metric"><div class="metric-label">Raw Wind</div>
-              <div class="metric-value">8 mph SE</div></div>
-            <div class="metric"><div class="metric-label">Cloud Cover</div>
-              <div class="metric-value ">100%</div></div>
-            <div class="metric"><div class="metric-label">Session Length</div>
-              <div class="metric-value ">1+ hr</div></div>
+          <div class="pm">
+            <div class="m"><div class="ml">Effective Wind</div><div class="mv wv">9.0 mph</div></div>
+            <div class="m"><div class="ml">Raw Wind</div><div class="mv">9 mph NW</div></div>
+            <div class="m"><div class="ml">Cloud Cover</div><div class="mv gv">3%</div></div>
+            <div class="m"><div class="ml">Session Length</div><div class="mv ">1+ hr</div></div>
           </div>
-          <div class="pick-notes">Near-calm winds · Sheltered (easterly wind) · Overcast · Civil twilight — soft light</div>
+          <div class="sol-tag">🌕 Moon underfoot</div>
+          <div class="pick-notes">Exposed (westerly wind) · Bright sun · Civil twilight — soft light</div>
         </div>
         <div class="pick-card good">
           <div class="pick-rank">3</div>
           <div class="pick-badge badge-good">Good</div>
+          <div class="pick-date">Thursday, Mar 12</div>
           <div class="pick-time">7:00 AM — morning</div>
-          <div class="pick-date">Saturday, Mar 14&nbsp;&nbsp;🌅 7:08 AM &nbsp; 🌇 7:00 PM</div>
-          <div class="score-bar-wrap">
-            <div class="score-bar-label"><span>Photo Score</span>
-              <span style="color:#c9a84c">60/100</span></div>
-            <div class="score-bar">
-              <div class="score-bar-fill" style="width:60%;background:#c9a84c"></div>
-            </div>
+          <div class="pick-sun">🌅 7:12 AM &nbsp; 🌇 6:58 PM</div>
+          <div class="sb-wrap">
+            <div class="sb-lbl"><span>Photo Score</span><span style="color:#c9a84c">61/100</span></div>
+            <div class="sb"><div class="sb-fill" style="width:61%;background:#c9a84c"></div></div>
           </div>
-          <div class="pick-metrics">
-            <div class="metric"><div class="metric-label">Effective Wind</div>
-              <div class="metric-value good-val">1.8 mph</div></div>
-            <div class="metric"><div class="metric-label">Raw Wind</div>
-              <div class="metric-value">6 mph ESE</div></div>
-            <div class="metric"><div class="metric-label">Cloud Cover</div>
-              <div class="metric-value ">100%</div></div>
-            <div class="metric"><div class="metric-label">Session Length</div>
-              <div class="metric-value ">2+ hrs</div></div>
+          <div class="pm">
+            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">6.0 mph</div></div>
+            <div class="m"><div class="ml">Raw Wind</div><div class="mv">6 mph SW</div></div>
+            <div class="m"><div class="ml">Cloud Cover</div><div class="mv gv">39%</div></div>
+            <div class="m"><div class="ml">Session Length</div><div class="mv ">2+ hrs</div></div>
           </div>
-          <div class="pick-notes">Near-calm winds · Sheltered (easterly wind) · Overcast · Civil twilight — soft light</div>
+          <div class="sol-tag">🌕 Moon overhead</div>
+          <div class="pick-notes">Light breeze · Exposed (westerly wind) · Partly cloudy · Civil twilight — soft light</div>
         </div>
         <div class="pick-card good">
           <div class="pick-rank">4</div>
           <div class="pick-badge badge-good">Good</div>
-          <div class="pick-time">7:00 PM — evening</div>
-          <div class="pick-date">Saturday, Mar 14&nbsp;&nbsp;🌅 7:08 AM &nbsp; 🌇 7:00 PM</div>
-          <div class="score-bar-wrap">
-            <div class="score-bar-label"><span>Photo Score</span>
-              <span style="color:#c9a84c">57/100</span></div>
-            <div class="score-bar">
-              <div class="score-bar-fill" style="width:57%;background:#c9a84c"></div>
+          <div class="pick-date">Saturday, Mar 14</div>
+          <div class="pick-time">7:00 AM — morning</div>
+          <div class="pick-sun">🌅 7:08 AM &nbsp; 🌇 7:00 PM</div>
+          <div class="sb-wrap">
+            <div class="sb-lbl"><span>Photo Score</span><span style="color:#c9a84c">56/100</span></div>
+            <div class="sb"><div class="sb-fill" style="width:56%;background:#c9a84c"></div></div>
+          </div>
+          <div class="pm">
+            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">1.8 mph</div></div>
+            <div class="m"><div class="ml">Raw Wind</div><div class="mv">6 mph ESE</div></div>
+            <div class="m"><div class="ml">Cloud Cover</div><div class="mv ">100%</div></div>
+            <div class="m"><div class="ml">Session Length</div><div class="mv ">1+ hr</div></div>
+          </div>
+          
+          <div class="pick-notes">Near-calm winds · Sheltered (easterly wind) · Overcast · Civil twilight — soft light</div>
+        </div></div>
+  <div class="sl">Haikubox · Lake Koshkonong</div>
+  <div class="hb-grid">
+          <div class="hb-card">
+            <h3>🎙 Recently on your deck <span class="hb-meta">last 24h · 121 detections · 30 species</span></h3>
+            <div class="sp-group">
+              <div class="sp-group-label"><span class="sp-group-icon">🦅</span>Raptors & Owls</div>
+              <div class="sp-row">
+              <div class="sp-rank">#1</div>
+              <div class="sp-name">Bald Eagle</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#a78bfa;opacity:.8"></div></div>
+              <div class="sp-cnt">3</div>
+              <div class="sp-ago">9h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#2</div>
+              <div class="sp-name">Merlin</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:20%;background:#a78bfa;opacity:.8"></div></div>
+              <div class="sp-cnt">1</div>
+              <div class="sp-ago">7h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#3</div>
+              <div class="sp-name">Great Horned Owl</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:20%;background:#a78bfa;opacity:.8"></div></div>
+              <div class="sp-cnt">1</div>
+              <div class="sp-ago">22h ago</div>
+            </div>
+            </div><div class="sp-group">
+              <div class="sp-group-label"><span class="sp-group-icon">🦆</span>Waterfowl</div>
+              <div class="sp-row">
+              <div class="sp-rank">#4</div>
+              <div class="sp-name">Canada Goose</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#60a5fa;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">2m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#5</div>
+              <div class="sp-name">Mallard</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#60a5fa;opacity:.8"></div></div>
+              <div class="sp-cnt">4</div>
+              <div class="sp-ago">8h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#6</div>
+              <div class="sp-name">Gadwall</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#60a5fa;opacity:.8"></div></div>
+              <div class="sp-cnt">2</div>
+              <div class="sp-ago">18h ago</div>
+            </div>
+            </div><div class="sp-group">
+              <div class="sp-group-label"><span class="sp-group-icon">🦩</span>Waders & Shorebirds</div>
+              <div class="sp-row">
+              <div class="sp-rank">#7</div>
+              <div class="sp-name">Killdeer</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#34d399;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">3h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#8</div>
+              <div class="sp-name">Sandhill Crane</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#34d399;opacity:.8"></div></div>
+              <div class="sp-cnt">4</div>
+              <div class="sp-ago">12m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#9</div>
+              <div class="sp-name">Virginia Rail</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#34d399;opacity:.8"></div></div>
+              <div class="sp-cnt">4</div>
+              <div class="sp-ago">23m ago</div>
+            </div>
+            </div><div class="sp-group">
+              <div class="sp-group-label"><span class="sp-group-icon">🕊️</span>Gulls & Terns</div>
+              <div class="sp-row">
+              <div class="sp-rank">#10</div>
+              <div class="sp-name">Ring-billed Gull</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#94a3b8;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">11h ago</div>
+            </div>
+            </div><div class="sp-group">
+              <div class="sp-group-label"><span class="sp-group-icon">🐦</span>Woodpeckers</div>
+              <div class="sp-row">
+              <div class="sp-rank">#11</div>
+              <div class="sp-name">Red-bellied Woodpecker</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#fb923c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#12</div>
+              <div class="sp-name">Downy Woodpecker</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#fb923c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">2h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#13</div>
+              <div class="sp-name">Red-headed Woodpecker</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#fb923c;opacity:.8"></div></div>
+              <div class="sp-cnt">3</div>
+              <div class="sp-ago">4h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#14</div>
+              <div class="sp-name">Northern Flicker</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:20%;background:#fb923c;opacity:.8"></div></div>
+              <div class="sp-cnt">1</div>
+              <div class="sp-ago">4h ago</div>
+            </div>
+            </div><div class="sp-group">
+              <div class="sp-group-label"><span class="sp-group-icon">🎵</span>Songbirds & Others</div>
+              <div class="sp-row">
+              <div class="sp-rank">#15</div>
+              <div class="sp-name">American Robin</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">0m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#16</div>
+              <div class="sp-name">House Sparrow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">18m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#17</div>
+              <div class="sp-name">Common Grackle</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">22m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#18</div>
+              <div class="sp-name">Northern Cardinal</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">25m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#19</div>
+              <div class="sp-name">White-breasted Nuthatch</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">44m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#20</div>
+              <div class="sp-name">Black-capped Chickadee</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">58m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#21</div>
+              <div class="sp-name">European Starling</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">59m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#22</div>
+              <div class="sp-name">House Finch</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#23</div>
+              <div class="sp-name">Mourning Dove</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#24</div>
+              <div class="sp-name">Red-winged Blackbird</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#25</div>
+              <div class="sp-name">American Crow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">4h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#26</div>
+              <div class="sp-name">Blue Jay</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">4h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#27</div>
+              <div class="sp-name">American Goldfinch</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">7h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#28</div>
+              <div class="sp-name">Brown Creeper</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">3</div>
+              <div class="sp-ago">3h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#29</div>
+              <div class="sp-name">American Tree Sparrow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">3</div>
+              <div class="sp-ago">12h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#30</div>
+              <div class="sp-name">Song Sparrow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">2</div>
+              <div class="sp-ago">1h ago</div>
+            </div>
+            </div>
+            <div style="margin-top:12px;font-size:10px;color:var(--sub)">
+              <a href="https://birds.haikubox.com/listen/3485189C16A4" target="_blank"
+                 style="color:var(--gold);text-decoration:none">Listen live on Haikubox →</a>
             </div>
           </div>
-          <div class="pick-metrics">
-            <div class="metric"><div class="metric-label">Effective Wind</div>
-              <div class="metric-value good-val">3.9 mph</div></div>
-            <div class="metric"><div class="metric-label">Raw Wind</div>
-              <div class="metric-value">13 mph E</div></div>
-            <div class="metric"><div class="metric-label">Cloud Cover</div>
-              <div class="metric-value ">100%</div></div>
-            <div class="metric"><div class="metric-label">Session Length</div>
-              <div class="metric-value ">1+ hr</div></div>
+          <div class="hb-card">
+            <h3>📊 Peak activity <span class="hb-meta">peak: 5:00 PM</span></h3>
+            <div class="act-chart"><div class="act-col">
+              <div class="act-bar" style="height:4px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl">0</div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:11px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl">6</div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:19px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:6px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:11px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:8px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:6px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl">12</div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:11px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:32px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:8px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:4px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:74px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:55px;background:var(--prime)"></div>
+              <div class="act-lbl">18</div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div></div>
+            <div style="margin-top:12px;font-size:10px;color:var(--sub);line-height:1.9">
+              <span style="color:#a78bfa">🦅 3</span> &nbsp;·&nbsp; <span style="color:#60a5fa">🦆 3</span> &nbsp;·&nbsp; <span style="color:#34d399">🦩 3</span> &nbsp;·&nbsp; <span style="color:#94a3b8">🕊️ 1</span> &nbsp;·&nbsp; <span style="color:#fb923c">🐦 4</span> &nbsp;·&nbsp; <span style="color:#c9a84c">🎵 16</span><br>
+              121 total detections · last 24 hrs
+            </div>
           </div>
-          <div class="pick-notes">Light breeze · Sheltered (easterly wind) · Overcast</div>
-        </div></div>
-  <div class="section-label" style="margin-top:16px">7-day hourly forecast</div>
+        </div>
+  <div class="sl" style="margin-top:16px">7-day hourly forecast</div>
   
         <div class="day-block">
           <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Tuesday</div>
-              <div class="day-date-sub">Mar 10</div>
+            <div><div class="day-name">Tuesday</div><div class="day-sub">Mar 10</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 58/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:15 AM &nbsp;🌇 6:55 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 12:11 AM · 🌕 6:22 AM · 🌙 12:33 PM · 🌕 6:44 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 13 mph</span>
+              
             </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 63/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:15 AM &nbsp;🌇 6:55 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 12 mph</span>
-              <span class="day-pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
-            </div>
-            <div class="day-expand">▾</div>
+            <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 10:00 AM · 3 consecutive hrs score ≥50 · Avg wind 12 mph</div>
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
+            <div class="sol-banner">🌕 Solunar windows: 🌙 12:11 AM &nbsp;·&nbsp; 🌕 6:22 AM &nbsp;·&nbsp; 🌙 12:33 PM &nbsp;·&nbsp; 🌕 6:44 PM</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
-        <div class="hour-row highlighted">
+        <div class="hr-row hl">
           <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-good">Good</span></div>
-          <div class="wind-good">2.4 mph ⛨</div>
+          <div><span class="chip c-gd">Good</span> <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span></div>
+          <div class="wg">2.4 mph ⛨</div>
           <div>↑ NNE (8)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Near-calm winds · Overcast · Civil twilight — soft light</div>
+          <div class="hr-notes">Near-calm winds · Overcast · Civil twilight — soft light · 🌕 Moon overhead</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌅 8:00 AM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">4.2 mph ⛨</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">4.2 mph ⛨</div>
           <div>↑ NNE (14)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">4.2 mph ⛨</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">4.2 mph ⛨</div>
           <div>↗ NNE (14)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">4.2 mph ⛨</div>
-          <div>↗ ENE (14)</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">4.2 mph ⛨</div>
+          <div>↗ NE (14)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
-        <div class="hour-row ">
-          <div>🌤 6:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-good">3.0 mph ⛨</div>
-          <div>↗ NE (10)</div>
+        <div class="hr-row ">
+          <div>🌇 6:00 PM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wg">3.6 mph ⛨</div>
+          <div>↗ ENE (12)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Rain likely</div>
+          <div class="hr-notes">Light breeze · Overcast · 🌕 Moon underfoot</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row hl">
           <div>🌤 7:00 PM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">3.0 mph ⛨</div>
-          <div>↗ NE (10)</div>
+          <div><span class="chip c-gd">Good</span> <span style="color:var(--prime);font-size:10px">🌕</span></div>
+          <div class="wg">4.2 mph ⛨</div>
+          <div>↗ NE (14)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Light breeze · Overcast · Civil twilight — soft light · 🌕 Moon underfoot</div>
+        </div>
+          </div>
+        </div>
+        <div class="day-block">
+          <div class="day-header" onclick="toggleDay(this)">
+            <div><div class="day-name">Wednesday</div><div class="day-sub">Mar 11</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 63/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:13 AM &nbsp;🌇 6:56 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 12:56 AM · 🌕 7:07 AM · 🌙 1:18 PM · 🌕 7:29 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 14 mph</span>
+              
+            </div>
+            <div class="dexp">▾</div>
+          </div>
+          <div class="day-content">
+            <div class="sol-banner">🌕 Solunar windows: 🌙 12:56 AM &nbsp;·&nbsp; 🌕 7:07 AM &nbsp;·&nbsp; 🌙 1:18 PM &nbsp;·&nbsp; 🌕 7:29 PM</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
+            
+        <div class="hr-row ">
+          <div>☀️ 7:00 AM</div>
+          <div><span class="chip c-po">—</span> <span style="color:var(--prime);font-size:10px">🌕</span></div>
+          <div class="wb">15.0 mph</div>
+          <div>↑ NNW (15)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · Overcast · Civil twilight — soft light · 🌕 Moon overhead</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌅 8:00 AM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">14.0 mph</div>
+          <div>↑ NNW (14)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · Overcast · 🌕 Moon overhead</div>
+        </div>
+        <div class="hr-row ">
+          <div>☀️ 9:00 AM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">15.0 mph</div>
+          <div>↑ NNW (15)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌤 5:00 PM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">16.0 mph</div>
+          <div>↖ NW (16)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌇 6:00 PM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">15.0 mph</div>
+          <div>↖ NW (15)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+        </div>
+        <div class="hr-row hl">
+          <div>🌤 7:00 PM</div>
+          <div><span class="chip c-gd">Good</span> <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span></div>
+          <div class="ww">9.0 mph</div>
+          <div>↖ NW (9)</div>
+          <div style="color:var(--sub)">3% ☁</div>
+          <div class="hr-notes">Bright sun · Civil twilight — soft light · 🌕 Moon underfoot</div>
+        </div>
+          </div>
+        </div>
+        <div class="day-block">
+          <div class="day-header" onclick="toggleDay(this)">
+            <div><div class="day-name">Thursday</div><div class="day-sub">Mar 12</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:var(--prime-bg);color:#a78bfa">Best: 61/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:12 AM &nbsp;🌇 6:58 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 1:41 AM · 🌕 7:52 AM · 🌙 2:04 PM · 🌕 8:15 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 9 mph</span>
+              <span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 Prime session</span><span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
+            </div>
+            <div class="dexp">▾</div>
+          </div>
+          <div class="day-content">
+            <div class="sol-banner">🌕 Solunar windows: 🌙 1:41 AM &nbsp;·&nbsp; 🌕 7:52 AM &nbsp;·&nbsp; 🌙 2:04 PM &nbsp;·&nbsp; 🌕 8:15 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 9:00 AM · 2 consecutive hrs ≥50 · Avg wind 6 mph</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
+            
+        <div class="hr-row hl">
+          <div>☀️ 7:00 AM</div>
+          <div><span class="chip c-gd">Good</span></div>
+          <div class="wg">6.0 mph</div>
+          <div>↙ SW (6)</div>
+          <div style="color:var(--sub)">39% ☁</div>
+          <div class="hr-notes">Light breeze · Partly cloudy · Civil twilight — soft light · 🌕 Moon overhead</div>
+        </div>
+        <div class="hr-row pr">
+          <div>🌅 8:00 AM</div>
+          <div><span class="chip c-pr">🌕 Prime</span> <span style="color:var(--prime);font-size:10px">🌕</span></div>
+          <div class="ww">7.0 mph</div>
+          <div>↙ SW (7)</div>
+          <div style="color:var(--sub)">8% ☁</div>
+          <div class="hr-notes">🌅 Golden hour · 🌕 Moon overhead · 🌕 Prime session — golden hour + calm + major solunar aligned</div>
+        </div>
+        <div class="hr-row ">
+          <div>☀️ 9:00 AM</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="ww">11.0 mph</div>
+          <div>↙ WSW (11)</div>
+          <div style="color:var(--sub)">6% ☁</div>
+          <div class="hr-notes">Moderate wind · Bright sun</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌤 5:00 PM</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">6.0 mph</div>
+          <div>↙ SSW (10)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Light breeze · Overcast</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌇 6:00 PM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wg">5.4 mph</div>
+          <div>↓ S (9)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Light breeze · Overcast</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌤 7:00 PM</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">6.0 mph</div>
+          <div>↓ SSE (10)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast · Civil twilight — soft light</div>
         </div>
@@ -300,283 +732,131 @@
         </div>
         <div class="day-block">
           <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Wednesday</div>
-              <div class="day-date-sub">Mar 11</div>
-            </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(255,255,255,.05);color:#8fa3b1">Best: 29/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:13 AM &nbsp;🌇 6:56 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 14 mph</span>
+            <div><div class="day-name">Friday</div><div class="day-sub">Mar 13</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:rgba(255,255,255,.05);color:#e67e22">Best: 43/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:10 AM &nbsp;🌇 6:59 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 2:26 AM · 🌕 8:38 AM · 🌙 2:50 PM · 🌕 9:01 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 23 mph</span>
               
             </div>
-            <div class="day-expand">▾</div>
+            <div class="dexp">▾</div>
           </div>
           <div class="day-content">
+            <div class="sol-banner">🌕 Solunar windows: 🌙 2:26 AM &nbsp;·&nbsp; 🌕 8:38 AM &nbsp;·&nbsp; 🌙 2:50 PM &nbsp;·&nbsp; 🌕 9:01 PM</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
-            
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">12.0 mph</div>
-          <div>↑ NNW (12)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Moderate wind · Overcast · Civil twilight — soft light</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌅 8:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">14.0 mph</div>
-          <div>↖ NNW (14)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-warn">7.2 mph</div>
-          <div>↑ N (12)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">16.0 mph</div>
-          <div>↖ NW (16)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌇 6:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">15.0 mph</div>
-          <div>↖ NW (15)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌤 7:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">15.0 mph</div>
-          <div>↖ NW (15)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast · Civil twilight — soft light</div>
-        </div>
-          </div>
-        </div>
-        <div class="day-block">
-          <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Thursday</div>
-              <div class="day-date-sub">Mar 12</div>
-            </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 66/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:12 AM &nbsp;🌇 6:58 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 9 mph</span>
-              <span class="day-pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
-            </div>
-            <div class="day-expand">▾</div>
-          </div>
-          <div class="day-content">
-            <div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 9:00 AM · 2 consecutive hrs score ≥50 · Avg wind 8 mph</div>
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
-            
-        <div class="hour-row highlighted">
-          <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-good">Good</span></div>
-          <div class="wind-warn">8.0 mph</div>
-          <div>← W (8)</div>
-          <div style="color:var(--sub)">30% ☁</div>
-          <div class="hr-notes">Partly cloudy · Civil twilight — soft light</div>
-        </div>
-        <div class="hour-row highlighted">
-          <div>🌅 8:00 AM</div>
-          <div><span class="score-chip chip-good">Good</span></div>
-          <div class="wind-warn">8.0 mph</div>
-          <div>← WNW (8)</div>
-          <div style="color:var(--sub)">6% ☁</div>
-          <div class="hr-notes">🌅 Golden hour</div>
-        </div>
-        <div class="hour-row ">
-          <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-warn">10.0 mph</div>
-          <div>↖ WNW (10)</div>
-          <div style="color:var(--sub)">6% ☁</div>
-          <div class="hr-notes">Moderate wind · Bright sun</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-warn">11.0 mph</div>
-          <div>↙ SW (11)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Moderate wind · Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌇 6:00 PM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">4.8 mph</div>
-          <div>↓ S (8)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Light breeze · Overcast</div>
-        </div>
-        <div class="hour-row highlighted">
-          <div>🌤 7:00 PM</div>
-          <div><span class="score-chip chip-good">Good</span></div>
-          <div class="wind-good">2.4 mph ⛨</div>
-          <div>↘ SE (8)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Near-calm winds · Overcast · Civil twilight — soft light</div>
-        </div>
-          </div>
-        </div>
-        <div class="day-block">
-          <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Friday</div>
-              <div class="day-date-sub">Mar 13</div>
-            </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(255,255,255,.05);color:#8fa3b1">Best: 27/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:10 AM &nbsp;🌇 6:59 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 22 mph</span>
-              
-            </div>
-            <div class="day-expand">▾</div>
-          </div>
-          <div class="day-content">
-            
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
-            
-        <div class="hour-row ">
-          <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">27.0 mph</div>
-          <div>← W (27)</div>
-          <div style="color:var(--sub)">95% ☁</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">29.0 mph</div>
+          <div>← W (29)</div>
+          <div style="color:var(--sub)">9% ☁</div>
           <div class="hr-notes">Rain likely</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌅 8:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">25.0 mph</div>
-          <div>← W (25)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+          <div><span class="chip c-po">—</span> <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span></div>
+          <div class="wb">27.0 mph</div>
+          <div>← W (27)</div>
+          <div style="color:var(--sub)">10% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · 🌅 Golden hour · 🌕 Moon overhead</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">26.0 mph</div>
-          <div>← W (26)</div>
+          <div><span class="chip c-po">—</span> <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span></div>
+          <div class="wb">27.0 mph</div>
+          <div>← W (27)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+          <div class="hr-notes">Windy — deck exposed · Overcast · 🌕 Moon overhead</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">20.0 mph</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">20.0 mph</div>
           <div>↖ NW (20)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Windy — deck exposed · Overcast</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌇 6:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">18.0 mph</div>
-          <div>↖ NW (18)</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">20.0 mph</div>
+          <div>↖ NW (20)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Windy — deck exposed · Overcast</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 7:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">15.0 mph</div>
-          <div>↖ NW (15)</div>
-          <div style="color:var(--sub)">90% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast · Civil twilight — soft light</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wb">16.0 mph</div>
+          <div>↖ NW (16)</div>
+          <div style="color:var(--sub)">6% ☁</div>
+          <div class="hr-notes">Windy — deck exposed · Bright sun · Civil twilight — soft light</div>
         </div>
           </div>
         </div>
         <div class="day-block">
           <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Saturday</div>
-              <div class="day-date-sub">Mar 14</div>
+            <div><div class="day-name">Saturday</div><div class="day-sub">Mar 14</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 56/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:08 AM &nbsp;🌇 7:00 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 3:13 AM · 🌕 9:25 AM · 🌙 3:37 PM · 🌕 9:49 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 9 mph</span>
+              
             </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 60/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:08 AM &nbsp;🌇 7:00 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 10 mph</span>
-              <span class="day-pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
-            </div>
-            <div class="day-expand">▾</div>
+            <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 9:00 AM · 2 consecutive hrs score ≥50 · Avg wind 7 mph</div>
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
+            <div class="sol-banner">🌕 Solunar windows: 🌙 3:13 AM &nbsp;·&nbsp; 🌕 9:25 AM &nbsp;·&nbsp; 🌙 3:37 PM &nbsp;·&nbsp; 🌕 9:49 PM</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
-        <div class="hour-row highlighted">
+        <div class="hr-row hl">
           <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-good">Good</span></div>
-          <div class="wind-good">1.8 mph ⛨</div>
+          <div><span class="chip c-gd">Good</span></div>
+          <div class="wg">1.8 mph ⛨</div>
           <div>→ ESE (6)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Near-calm winds · Overcast · Civil twilight — soft light</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌅 8:00 AM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">2.4 mph ⛨</div>
-          <div>→ ESE (8)</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">2.1 mph ⛨</div>
+          <div>→ ESE (7)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Near-calm winds · Overcast</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">3.0 mph ⛨</div>
-          <div>↘ ESE (10)</div>
+          <div><span class="chip c-fr">Fair</span> <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span></div>
+          <div class="wg">2.4 mph ⛨</div>
+          <div>↘ SE (8)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Light breeze · Overcast</div>
+          <div class="hr-notes">Near-calm winds · Overcast · 🌕 Moon overhead</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">3.6 mph ⛨</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">3.6 mph ⛨</div>
           <div>↘ ESE (12)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌇 6:00 PM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-good">3.3 mph ⛨</div>
-          <div>→ E (11)</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wg">3.3 mph ⛨</div>
+          <div>→ ESE (11)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
-        <div class="hour-row highlighted">
+        <div class="hr-row ">
           <div>🌇 7:00 PM</div>
-          <div><span class="score-chip chip-good">Good</span></div>
-          <div class="wind-good">3.9 mph ⛨</div>
-          <div>→ E (13)</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="wg">3.0 mph ⛨</div>
+          <div>→ E (10)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
@@ -584,70 +864,65 @@
         </div>
         <div class="day-block">
           <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Sunday</div>
-              <div class="day-date-sub">Mar 15</div>
-            </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(255,255,255,.05);color:#8fa3b1">Best: 0/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:06 AM &nbsp;🌇 7:01 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 23 mph</span>
+            <div><div class="day-name">Sunday</div><div class="day-sub">Mar 15</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:rgba(255,255,255,.05);color:#8fa3b1">Best: 0/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:06 AM &nbsp;🌇 7:01 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 4:01 AM · 🌕 10:13 AM · 🌙 4:25 PM · 🌕 10:37 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 24 mph</span>
               
             </div>
-            <div class="day-expand">▾</div>
+            <div class="dexp">▾</div>
           </div>
           <div class="day-content">
+            <div class="sol-banner">🌕 Solunar windows: 🌙 4:01 AM &nbsp;·&nbsp; 🌕 10:13 AM &nbsp;·&nbsp; 🌙 4:25 PM &nbsp;·&nbsp; 🌕 10:37 PM</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
-            
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-good">5.1 mph ⛨</div>
-          <div>↗ NE (17)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Rain likely</div>
-        </div>
-        <div class="hour-row ">
-          <div>☀️ 8:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-good">6.0 mph ⛨</div>
-          <div>↗ NE (20)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Rain likely</div>
-        </div>
-        <div class="hour-row ">
-          <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-good">6.9 mph ⛨</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wg">6.9 mph ⛨</div>
           <div>↗ NE (23)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Rain likely</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
+          <div>☀️ 8:00 AM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wg">6.3 mph ⛨</div>
+          <div>↗ NE (21)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Rain likely</div>
+        </div>
+        <div class="hr-row ">
+          <div>☀️ 9:00 AM</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="ww">7.8 mph ⛨</div>
+          <div>↗ NE (26)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Rain likely</div>
+        </div>
+        <div class="hr-row ">
           <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">15.6 mph</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">15.6 mph</div>
           <div>↑ N (26)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Rain likely</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 6:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">15.0 mph</div>
-          <div>↑ N (25)</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">14.4 mph</div>
+          <div>↑ N (24)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Rain likely</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 7:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">15.0 mph</div>
-          <div>↑ N (25)</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="wb">13.2 mph</div>
+          <div>↑ N (22)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Rain likely</div>
         </div>
@@ -655,113 +930,108 @@
         </div>
         <div class="day-block">
           <div class="day-header" onclick="toggleDay(this)">
-            <div>
-              <div class="day-name">Monday</div>
-              <div class="day-date-sub">Mar 16</div>
-            </div>
-            <div class="day-summary">
-              <span class="day-pill" style="background:rgba(255,255,255,.05);color:#e67e22">Best: 36/100</span>
-              <span class="day-pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:05 AM &nbsp;🌇 7:02 PM</span>
-              <span class="day-pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 17 mph</span>
+            <div><div class="day-name">Monday</div><div class="day-sub">Mar 16</div></div>
+            <div class="day-sum">
+              <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 55/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 7:05 AM &nbsp;🌇 7:02 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 4:50 AM · 🌕 11:02 AM · 🌙 5:15 PM · 🌕 11:28 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 8 mph</span>
               
             </div>
-            <div class="day-expand">▾</div>
+            <div class="dexp">▾</div>
           </div>
           <div class="day-content">
+            <div class="sol-banner">🌕 Solunar windows: 🌙 4:50 AM &nbsp;·&nbsp; 🌕 11:02 AM &nbsp;·&nbsp; 🌙 5:15 PM &nbsp;·&nbsp; 🌕 11:28 PM</div>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+              <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
-            <div class="hour-header">
-              <span>Time</span><span>Score</span><span>Eff. Wind</span>
-              <span>Direction</span><span>Clouds</span><span>Notes</span>
-            </div>
-            
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 7:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">20.0 mph</div>
-          <div>↖ NW (20)</div>
-          <div style="color:var(--sub)">85% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast · Civil twilight — soft light</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="ww">7.0 mph</div>
+          <div>↖ WNW (7)</div>
+          <div style="color:var(--sub)">6% ☁</div>
+          <div class="hr-notes">Bright sun · Civil twilight — soft light</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌅 8:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">19.0 mph</div>
-          <div>↖ NW (19)</div>
-          <div style="color:var(--sub)">85% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="ww">8.0 mph</div>
+          <div>↖ WNW (8)</div>
+          <div style="color:var(--sub)">1% ☁</div>
+          <div class="hr-notes">🌅 Golden hour</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>☀️ 9:00 AM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">19.0 mph</div>
-          <div>↖ NW (19)</div>
-          <div style="color:var(--sub)">87% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
+          <div><span class="chip c-po">—</span></div>
+          <div class="ww">10.0 mph</div>
+          <div>↖ NW (10)</div>
+          <div style="color:var(--sub)">1% ☁</div>
+          <div class="hr-notes">Moderate wind · Bright sun</div>
         </div>
-        <div class="hour-row ">
+        <div class="hr-row ">
           <div>🌤 5:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">16.0 mph</div>
-          <div>↖ NW (16)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌤 6:00 PM</div>
-          <div><span class="score-chip chip-poor">—</span></div>
-          <div class="wind-bad">14.0 mph</div>
-          <div>↖ NW (14)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Windy — deck exposed · Overcast</div>
-        </div>
-        <div class="hour-row ">
-          <div>🌇 7:00 PM</div>
-          <div><span class="score-chip chip-fair">Fair</span></div>
-          <div class="wind-bad">12.0 mph</div>
+          <div><span class="chip c-po">—</span> <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span></div>
+          <div class="wb">12.0 mph</div>
           <div>↖ NW (12)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Moderate wind · Overcast</div>
+          <div class="hr-notes">Moderate wind · Overcast · 🌙 Moonset</div>
+        </div>
+        <div class="hr-row ">
+          <div>🌤 6:00 PM</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div class="ww">8.0 mph</div>
+          <div>↖ NW (8)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Overcast · 🌙 Moonset</div>
+        </div>
+        <div class="hr-row hl">
+          <div>🌇 7:00 PM</div>
+          <div><span class="chip c-gd">Good</span></div>
+          <div class="wg">5.0 mph</div>
+          <div>↖ NW (5)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Light breeze · Overcast</div>
         </div>
           </div>
         </div>
-  <div class="section-label" style="margin-top:40px">Scoring guide</div>
-  <div class="key-grid">
-    <div class="key-card"><h4>Wind Logic</h4><ul>
+  <div class="sl" style="margin-top:40px">Scoring guide</div>
+  <div class="kg">
+    <div class="kc"><h4>What's New in v2.0</h4><ul>
+      <li>🌕 Solunar tables — major/minor feeding windows from lunar position math</li>
+      <li>🌕 Prime Session tier — golden hour + calm + major solunar all aligned</li>
+      <li>🎙 Haikubox panel — live detections from your Lake Koshkonong device</li>
+      <li>Scoring: light 40 · golden hour 30 · solunar +20 · all normalized to 100</li>
+    </ul></div>
+    <div class="kc"><h4>Wind Logic</h4><ul>
       <li>Deck faces west over Lake Koshkonong</li>
-      <li>Easterly winds (E, NE, ENE): deck shielded ~70% — effective wind much lower</li>
+      <li>Easterly winds (E, NE, ENE): shielded ~70% — effective wind much lower</li>
       <li>Western winds (W, NW, SW): full exposure — raw wind applies</li>
-      <li>⛨ = sheltered indicator (easterly origin)</li>
+      <li>⛨ = sheltered (easterly wind direction)</li>
     </ul></div>
-    <div class="key-card"><h4>Blind Setup Advice</h4><ul>
-      <li>Green banners = 2+ consecutive hours scoring ≥50</li>
-      <li>Plan blind setup the evening before multi-hour morning windows</li>
-      <li>Below 10 mph effective wind = optimal for stationary blind</li>
-      <li>Sheltered easterly mornings = best for keeping blind up</li>
+    <div class="kc"><h4>Solunar Science</h4><ul>
+      <li>🌕 Major periods: moon overhead or underfoot (±1 hr) — peak feeding</li>
+      <li>🌙 Minor periods: moonrise / moonset (±1 hr) — moderate feeding</li>
+      <li>Aligned with golden hour = 🌕 Prime Session designation</li>
+      <li>Calculated entirely from lunar position math — no external API</li>
     </ul></div>
-    <div class="key-card"><h4>Eagle Watch Conditions</h4><ul>
-      <li>Easterly wind (calm, sheltered water surface)</li>
-      <li>Morning hours — bald eagles hunt with sun behind them</li>
-      <li>Clear to partly cloudy — bright water reveals fish</li>
-      <li>Look toward sunrise-lit shoreline trees</li>
-    </ul></div>
-    <div class="key-card"><h4>Score Breakdown</h4><ul>
-      <li>75–100: Excellent — set up blind tonight</li>
-      <li>55–74: Good — worth setting up same morning</li>
-      <li>35–54: Fair — casual observation, skip the blind</li>
-      <li>0–34: Poor — wind or light unfavorable</li>
+    <div class="kc"><h4>Score Breakdown</h4><ul>
+      <li>🌕 Prime: golden hour + calm + major solunar — rarest, best sessions</li>
+      <li>75–100 Excellent — set up blind tonight</li>
+      <li>55–74 Good — worth setting up same morning</li>
+      <li>35–54 Fair — casual observation only</li>
+      <li>Wind 40 + Light 40 + Sun 30 + Dry 10 + Solunar 20 → scaled to /100</li>
     </ul></div>
   </div>
   <footer>
-    Data: Open-Meteo · Location: 42.9136°N, 88.8601°W · Lake Koshkonong, Fort Atkinson WI<br>
-    Re-run the script any time to refresh the forecast
+    Data: Open-Meteo · Haikubox (Lake Koshkonong) · Solunar tables computed in Python<br>
+    42.9136°N, 88.8601°W · Lake Koshkonong, Fort Atkinson WI · v2.0
   </footer>
 </div>
 <script>
-function toggleDay(header) {
-  header.querySelector('.day-expand').classList.toggle('open');
-  header.nextElementSibling.classList.toggle('open');
+function toggleDay(h){
+  h.querySelector('.dexp').classList.toggle('open');
+  h.nextElementSibling.classList.toggle('open');
 }
-// Auto-open today
 document.querySelector('.day-header')?.click();
 </script>
 </body>
