@@ -1,14 +1,13 @@
 #!/usr/bin/env python3
 """
-Lake Koshkonong Bird Photography Session Planner  v2.0
+Lake Koshkonong Bird Photography Session Planner  v3.0
 ======================================================
-New in v2.0:
-  * Solunar tables -- major/minor feeding windows from pure Python lunar math
-  * Haikubox live detections -- "Recently on your deck" panel + peak activity chart
-  * 🌕 Prime Session tier -- golden hour + calm wind + major solunar aligned
-  * Updated scoring: light 40pts, golden hour 30pts, solunar up to +20pts (normalized to 100)
-
-Double-click or run: python3 bird_photo_planner_v2.py
+New in v3.0:
+  * West-wind penalty logic -- pure W direction only "calm" below 5 mph;
+    5-10 mph W deducts points; >10 mph W caps/eliminates GOOD or EXCELLENT
+  * Temperature shown in Best Upcoming Sessions pick cards
+  * Temperature shown in 7-day hourly forecast rows
+  * Blind Setup Window moved up top alongside Best Upcoming Sessions
 """
 
 import json
@@ -59,6 +58,28 @@ def wind_impact(speed, dir_deg):
     else:                   eff = speed * 0.6
     return eff, d, d in EXPOSED_DIRS, d in SHELTERED_DIRS
 
+def is_pure_west(dir_deg):
+    """Returns True only if wind direction is squarely from the west (W compass point)."""
+    return deg_to_compass(dir_deg) == 'W'
+
+def west_wind_penalty(speed, dir_deg):
+    """
+    Special penalty for pure west winds (birds go to other side of lake).
+    Returns (point_deduction, cap_score, note_str)
+      - point_deduction: subtracted from raw score
+      - cap_score: if not None, score is capped at this value
+      - note_str: note to display (or '')
+    """
+    if not is_pure_west(dir_deg):
+        return 0, None, ''
+    if speed < 5:
+        return 0, None, ''   # pure W but very light — acceptable
+    elif speed <= 10:
+        return 15, None, '⚠️ W wind — birds may move to far shore'
+    else:
+        # >10 mph pure W: cap at 50 (eliminates GOOD/EXCELLENT)
+        return 20, 50, '🚫 Strong W wind — birds likely on far shore'
+
 def parse_hhmm(s):
     if 'T' in s: s = s.split('T')[1]
     hh, mm = s[:5].split(':')
@@ -103,8 +124,7 @@ def solunar_windows(date_str, lat=LAT, lng=LNG):
     ct_ref  = utc_to_central(utc_ref)
     utc_off = (ct_ref.replace(tzinfo=None) - utc_ref.replace(tzinfo=None)).total_seconds() / 3600
 
-    # Sample hour-angles every minute across the day
-    jd_start = _jd(d.year, d.month, d.day, -utc_off)   # midnight CT in UTC
+    jd_start = _jd(d.year, d.month, d.day, -utc_off)
     ha_series = []
     for minute in range(1441):
         frac   = minute / 1440.0
@@ -120,11 +140,9 @@ def solunar_windows(date_str, lat=LAT, lng=LNG):
         for i in range(1, len(ha_series)):
             h0, a0 = ha_series[i-1]
             h1, a1 = ha_series[i]
-            # Handle 360/0 wrap by unwrapping
             diff = a1 - a0
             if diff >  180: a1 -= 360
             if diff < -180: a1 += 360
-            # Also handle target=0 wrap: re-centre around target
             a0c = ((a0 - target + 180) % 360) - 180
             a1c = a0c + (a1 - a0)
             if a0c * a1c <= 0 and a0c != a1c:
@@ -199,7 +217,8 @@ def score_hour(hr, wind, wind_dir, cloud, precip, sunrise, sunset, sol_windows=N
                 eff_speed=round(eff,1), direction=direction,
                 is_eagle=False, is_golden=False, is_prime=False,
                 solunar_pts=0, solunar_label='',
-                sunrise_h=sunrise, sunset_h=sunset)
+                sunrise_h=sunrise, sunset_h=sunset,
+                west_penalty=0, west_cap=None, west_note='')
 
     if period is None: return base
     if precip > 40:
@@ -207,7 +226,8 @@ def score_hour(hr, wind, wind_dir, cloud, precip, sunrise, sunset, sol_windows=N
 
     notes = []; raw = 0
 
-    # Wind — 40 pts
+    # ── Wind scoring — 40 pts ────────────────────────────────────────────────
+    # Base wind points from effective wind speed
     if   eff < 3:   raw += 40; notes.append('Near-calm winds')
     elif eff < 7:   raw += 33; notes.append('Light breeze')
     elif eff < 10:  raw += 20
@@ -216,7 +236,13 @@ def score_hour(hr, wind, wind_dir, cloud, precip, sunrise, sunset, sol_windows=N
     if sheltered: notes.append('Sheltered (easterly wind)')
     if exposed:   notes.append('Exposed (westerly wind)')
 
-    # Light quality — 40 pts
+    # ── Pure-West penalty (v3.0) ─────────────────────────────────────────────
+    w_deduct, w_cap, w_note = west_wind_penalty(wind, wind_dir)
+    if w_note:
+        notes.append(w_note)
+    raw -= w_deduct  # subtract from raw before normalization
+
+    # ── Light quality — 40 pts ───────────────────────────────────────────────
     if   cloud < 20: base_l = 40; notes.append('🌅 Golden hour' if is_gold else 'Bright sun')
     elif cloud < 45: base_l = 30; notes.append('Partly cloudy')
     elif cloud < 75: base_l = 16; notes.append('Mostly cloudy')
@@ -247,12 +273,18 @@ def score_hour(hr, wind, wind_dir, cloud, precip, sunrise, sunset, sol_windows=N
 
     # Normalize: theoretical max = 140 → scale to 100
     score = round(min(100, raw * 100 / 140))
+    score = max(0, score)  # no negatives
+
+    # Apply west-wind cap after normalization
+    if w_cap is not None:
+        score = min(score, w_cap)
 
     is_eagle = (period == 'morning' and direction in EAGLE_DIRS
                 and eff < 8 and cloud < 50 and float(hr) >= sunrise - 0.25)
     if is_eagle: notes.append('🦅 Eagle watch — easterly wind, calm water, low sun angle')
 
-    is_prime = is_gold and eff < 8 and sol_pts >= 15
+    # Prime session: suppress if strong pure-W wind
+    is_prime = is_gold and eff < 8 and sol_pts >= 15 and (w_cap is None)
     if is_prime: notes.append('🌕 Prime session — golden hour + calm + major solunar aligned')
 
     grade = ('prime'     if is_prime else
@@ -265,7 +297,8 @@ def score_hour(hr, wind, wind_dir, cloud, precip, sunrise, sunset, sol_windows=N
                 eff_speed=round(eff,1), direction=direction,
                 is_eagle=is_eagle, is_golden=is_gold, is_prime=is_prime,
                 solunar_pts=sol_pts, solunar_label=sol_lbl,
-                sunrise_h=sunrise, sunset_h=sunset)
+                sunrise_h=sunrise, sunset_h=sunset,
+                west_penalty=w_deduct, west_cap=w_cap, west_note=w_note)
 
 # ── Fetch data ────────────────────────────────────────────────────────────────
 def fetch_weather():
@@ -275,14 +308,14 @@ def fetch_weather():
            f"&daily=sunrise,sunset"
            f"&wind_speed_unit=mph&temperature_unit=fahrenheit"
            f"&timezone=America%2FChicago&forecast_days=7")
-    req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/2.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/3.0"})
     with urllib.request.urlopen(req, timeout=15) as r:
         return json.loads(r.read().decode())
 
 def fetch_haikubox(hours=24):
     url = f"https://api.haikubox.com/haikubox/{HAIKUBOX_ID}/detections?hours={hours}"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/2.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/3.0"})
         with urllib.request.urlopen(req, timeout=10) as r:
             return json.loads(r.read().decode())
     except Exception as e:
@@ -321,7 +354,6 @@ def fmt12(h):
     return f"{h}:00 AM" if h < 12 else f"{h-12}:00 PM"
 
 def fmt12f(h):
-    """Decimal hour → '6:30 AM'."""
     h = h % 24; hh = int(h); mm = int(round((h-hh)*60))
     if mm == 60: hh += 1; mm = 0
     hh %= 24
@@ -361,7 +393,6 @@ def build_html(weather_json, haikubox_data=None):
             'set_str':  (d['sunset'][i].split('T')[1][:5]  if 'T' in d['sunset'][i]  else d['sunset'][i][:5]),
         }
 
-    # Solunar windows by date
     print("  Computing solunar tables for 7 days...")
     sol_by_day = {ds: solunar_windows(ds) for ds in d['time']}
 
@@ -404,7 +435,6 @@ def build_html(weather_json, haikubox_data=None):
         seen.add(key); top_picks.append(c)
         if len(top_picks) >= 4: break
 
-    # Ensure a prime or eagle slot if not already present
     for flag in ('is_prime', 'is_eagle'):
         sc = next((r for r in candidates if r['analysis'].get(flag)), None)
         if sc and not any(p['dt'] == sc['dt'] for p in top_picks):
@@ -422,6 +452,31 @@ def build_html(weather_json, haikubox_data=None):
             if c['ds'] < now_ds or (c['ds'] == now_ds and c['hour'] < now_hr): continue
             existing.add(key); top_picks.append(c)
         top_picks.sort(key=lambda r: r['dt'])
+
+    # ── Compute blind setup windows for top section ───────────────────────────
+    def ext_sessions(hrs):
+        sessions, cur = [], None
+        for r in hrs:
+            if r['analysis']['score'] >= 50:
+                cur = (cur or []) + [r]
+            else:
+                if cur and len(cur)>=2: sessions.append(cur)
+                cur = None
+        if cur and len(cur)>=2: sessions.append(cur)
+        return sessions
+
+    # Best upcoming blind window (soonest, at least 2 hrs, score>=50)
+    best_blind = []
+    for ds, hrs in sorted(days.items()):
+        if ds < now_ds: continue
+        light = [r for r in hrs if r['analysis']['period']]
+        exts  = ext_sessions(light)
+        for s in exts:
+            # filter to future sessions
+            if ds == now_ds and s[-1]['hour'] < now_hr: continue
+            best_blind.append((ds, s))
+    # sort by start time then length desc
+    best_blind.sort(key=lambda x: (x[0], x[1][0]['hour']))
 
     generated = ct_now.strftime("%A %b %-d, %Y at %-I:%M %p CT")
 
@@ -456,8 +511,12 @@ def build_html(weather_json, haikubox_data=None):
       margin-bottom:14px;display:flex;align-items:center;gap:10px;}
     .sl::after{content:'';flex:1;height:1px;background:var(--border);}
 
+    /* Top section: picks + blind side-by-side */
+    .top-section{display:grid;grid-template-columns:1fr auto;gap:20px;margin-bottom:40px;align-items:start;}
+    @media(max-width:760px){.top-section{grid-template-columns:1fr;}}
+
     /* Picks */
-    .top-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;margin-bottom:40px;}
+    .top-picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
     .pick-card{background:var(--card);border:1px solid var(--border);border-radius:10px;
       padding:20px;position:relative;overflow:hidden;}
     .pick-card.excellent{border-color:rgba(39,174,96,.35);}
@@ -490,6 +549,21 @@ def build_html(weather_json, haikubox_data=None):
     .sol-tag{display:inline-block;background:rgba(167,139,250,.12);color:var(--prime);
       font-size:10px;padding:2px 8px;border-radius:10px;margin-top:6px;border:1px solid rgba(167,139,250,.2);}
 
+    /* Blind Setup sidebar */
+    .blind-sidebar{background:var(--card);border:1px solid rgba(39,174,96,.3);border-radius:10px;
+      padding:18px 20px;min-width:260px;max-width:320px;}
+    @media(max-width:760px){.blind-sidebar{max-width:100%;}}
+    .blind-sidebar h3{font-family:'Playfair Display',serif;font-size:15px;color:#2ecc71;
+      font-weight:400;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .blind-entry{background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.15);
+      border-radius:8px;padding:12px 14px;margin-bottom:10px;}
+    .blind-entry:last-child{margin-bottom:0;}
+    .blind-day{font-size:11px;color:var(--gold);font-weight:600;letter-spacing:.06em;
+      text-transform:uppercase;margin-bottom:4px;}
+    .blind-window{font-size:14px;color:var(--pale);margin-bottom:4px;}
+    .blind-meta{font-size:10px;color:var(--sub);}
+    .blind-empty{font-size:11px;color:var(--sub);font-style:italic;text-align:center;padding:16px 0;}
+
     /* Day blocks */
     .day-block{background:var(--card);border:1px solid var(--border);border-radius:10px;
       margin-bottom:10px;overflow:hidden;}
@@ -504,8 +578,8 @@ def build_html(weather_json, haikubox_data=None):
     .dexp.open{transform:rotate(180deg);}
     .day-content{display:none;border-top:1px solid var(--border);}
     .day-content.open{display:block;}
-    .hr-row{display:grid;grid-template-columns:80px 90px 100px 90px 80px 1fr;
-      align-items:center;gap:12px;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,.03);
+    .hr-row{display:grid;grid-template-columns:80px 90px 60px 100px 90px 80px 1fr;
+      align-items:center;gap:10px;padding:9px 20px;border-bottom:1px solid rgba(255,255,255,.03);
       font-size:12px;transition:background .1s;}
     .hr-row:last-child{border-bottom:none;}
     .hr-row:hover{background:rgba(255,255,255,.02);}
@@ -528,7 +602,7 @@ def build_html(weather_json, haikubox_data=None):
     .sol-banner{background:rgba(167,139,250,.05);border:1px solid rgba(167,139,250,.2);
       border-radius:8px;padding:10px 20px;margin:8px 20px 0;font-size:11px;
       color:var(--prime);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-    .hr-header{display:grid;grid-template-columns:80px 90px 100px 90px 80px 1fr;gap:12px;
+    .hr-header{display:grid;grid-template-columns:80px 90px 60px 100px 90px 80px 1fr;gap:10px;
       padding:8px 20px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;
       color:var(--sub);background:rgba(0,0,0,.2);}
     .kg{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin-bottom:40px;}
@@ -581,8 +655,6 @@ def build_html(weather_json, haikubox_data=None):
             mins = int((ct_now.replace(tzinfo=None) - dt_ct.replace(tzinfo=None)).total_seconds() / 60)
             return f"{mins}m ago" if mins < 60 else (f"{mins//60}h ago" if mins < 1440 else f"{mins//1440}d ago")
 
-        # ── Species categories ────────────────────────────────────────────────
-        # Each entry: (display label, emoji, bar color, set of species names)
         CATEGORIES = [
             ('Raptors & Owls', '🦅', '#a78bfa', {
                 'Bald Eagle','Golden Eagle','Osprey','Red-tailed Hawk','Cooper\'s Hawk',
@@ -617,28 +689,22 @@ def build_html(weather_json, haikubox_data=None):
                 'Red-headed Woodpecker','Pileated Woodpecker','Northern Flicker',
                 'Yellow-bellied Sapsucker',
             }),
-            ('Songbirds & Others', '🎵', '#c9a84c', {
-                # catch-all — everything not in the above groups
-            }),
+            ('Songbirds & Others', '🎵', '#c9a84c', {}),
         ]
 
-        # Assign each detected species to a category
         assigned = set()
         grouped  = {label: [] for label, _, _, _ in CATEGORIES}
         for sp in species_list:
-            for label, icon, color, members in CATEGORIES[:-1]:  # skip catch-all
+            for label, icon, color, members in CATEGORIES[:-1]:
                 if sp['name'] in members:
                     grouped[label].append(sp)
                     assigned.add(sp['name'])
                     break
-
-        # Everything unassigned → Songbirds & Others
         catchall_label = CATEGORIES[-1][0]
         for sp in species_list:
             if sp['name'] not in assigned:
                 grouped[catchall_label].append(sp)
 
-        # Overall max count (for bar scaling across all groups)
         max_cnt = species_list[0]['count'] if species_list else 1
 
         def sp_row(sp, rank, color):
@@ -651,13 +717,11 @@ def build_html(weather_json, haikubox_data=None):
               <div class="sp-ago">{ago(sp['last'])}</div>
             </div>"""
 
-        # Build grouped HTML — only show groups that have detections
         groups_html = ''
         overall_rank = 1
         for label, icon, color, _ in CATEGORIES:
             members = grouped.get(label, [])
-            if not members:
-                continue
+            if not members: continue
             rows_html = ''.join(sp_row(sp, overall_rank + i, color) for i, sp in enumerate(members))
             overall_rank += len(members)
             groups_html += f"""<div class="sp-group">
@@ -665,7 +729,6 @@ def build_html(weather_json, haikubox_data=None):
               {rows_html}
             </div>"""
 
-        # ── Activity chart ────────────────────────────────────────────────────
         mx = max(hourly_counts.values()) or 1
         bars = ''
         for hr in range(24):
@@ -681,8 +744,6 @@ def build_html(weather_json, haikubox_data=None):
 
         total   = sum(hourly_counts.values())
         peak_hr = max(hourly_counts, key=hourly_counts.get)
-
-        # Category summary pills for the activity card
         cat_summary = ' &nbsp;·&nbsp; '.join(
             f'<span style="color:{color}">{icon} {len(grouped[label])}</span>'
             for label, icon, color, _ in CATEGORIES
@@ -725,8 +786,6 @@ def build_html(weather_json, haikubox_data=None):
         day_hrs = days.get(rec['ds'], [])
         try:    idx = next(i for i,r in enumerate(day_hrs) if r['dt']==rec['dt'])
         except: idx = 0
-        sess_len = sum(1 for r in day_hrs[idx:] if r['analysis']['score']>=50)
-        # Session length: count from this hour forward while score >= 50
         sess_len = 0
         for r in day_hrs[idx:]:
             if r['analysis']['score'] >= 50: sess_len += 1
@@ -734,8 +793,13 @@ def build_html(weather_json, haikubox_data=None):
         sol_pts, sol_lbl = solunar_score(float(rec['hour']), sol_by_day.get(rec['ds'], []))
         sol_tag = f'<div class="sol-tag">{sol_lbl}</div>' if sol_lbl else ''
         ec  = 'gv' if eff<7 else 'wv' if eff<12 else 'bv'
+        # temp color: cold=blue-ish, warm=gold
+        temp_col = ('#60a5fa' if rec['temp'] < 32 else
+                    '#94a3b8' if rec['temp'] < 50 else
+                    'var(--text)' if rec['temp'] < 70 else
+                    'var(--warn)')
         notes_html = ' · '.join(
-            f"<strong>{nn}</strong>" if '🦅' in nn or '🌕' in nn else nn
+            f"<strong>{nn}</strong>" if '🦅' in nn or '🌕' in nn or '⚠️' in nn or '🚫' in nn else nn
             for nn in a['notes'] if not (sol_lbl and sol_lbl in nn and sol_tag))
         return f"""
         <div class="pick-card {g}">
@@ -749,8 +813,8 @@ def build_html(weather_json, haikubox_data=None):
             <div class="sb"><div class="sb-fill" style="width:{sc}%;background:{scol}"></div></div>
           </div>
           <div class="pm">
+            <div class="m"><div class="ml">Temp</div><div class="mv" style="color:{temp_col}">{rec['temp']}°F</div></div>
             <div class="m"><div class="ml">Effective Wind</div><div class="mv {ec}">{eff} mph</div></div>
-            <div class="m"><div class="ml">Raw Wind</div><div class="mv">{rec['wind']} mph {dir_}</div></div>
             <div class="m"><div class="ml">Cloud Cover</div><div class="mv {'gv' if rec['cloud']<40 else ''}">{rec['cloud']}%</div></div>
             <div class="m"><div class="ml">Session Length</div><div class="mv {'gv' if sess_len>=3 else ''}">{sess_len}+ hr{'s' if sess_len!=1 else ''}</div></div>
           </div>
@@ -759,6 +823,29 @@ def build_html(weather_json, haikubox_data=None):
         </div>"""
 
     picks_html = ''.join(pick_card(i+1, p) for i,p in enumerate(top_picks[:4]))
+
+    # ── Blind Setup sidebar (top section) ─────────────────────────────────────
+    def blind_sidebar_html():
+        if not best_blind:
+            return f"""<div class="blind-sidebar">
+              <h3>🎭 Blind Setup Windows</h3>
+              <div class="blind-empty">No multi-hour sessions ≥50 found in forecast</div>
+            </div>"""
+        entries = ''
+        for ds, s in best_blind[:5]:
+            avg_w = round(sum(r['wind'] for r in s) / len(s))
+            best_s = max(r['analysis']['score'] for r in s)
+            sc_col = ('#a78bfa' if best_s>=75 and any(r['analysis']['is_prime'] for r in s)
+                      else '#2ecc71' if best_s>=75 else 'var(--gold)')
+            entries += f"""<div class="blind-entry">
+              <div class="blind-day">{fmt_date(ds)}</div>
+              <div class="blind-window">{fmt12(s[0]['hour'])} – {fmt12(s[-1]['hour']+1)}</div>
+              <div class="blind-meta">{len(s)} consecutive hrs · Avg wind {avg_w} mph · Best <span style="color:{sc_col}">{best_s}/100</span></div>
+            </div>"""
+        return f"""<div class="blind-sidebar">
+          <h3>🎭 Blind Setup Windows</h3>
+          {entries}
+        </div>"""
 
     # ── Day blocks ────────────────────────────────────────────────────────────
     def hr_row(rec):
@@ -774,9 +861,12 @@ def build_html(weather_json, haikubox_data=None):
         wcls = 'wg' if eff<7 else 'ww' if eff<12 else 'wb'
         icon = ('🌅' if isg and a['period']=='morning' else '🌇' if isg and a['period']=='evening'
                 else '☀️' if a['period']=='morning' else '🌤')
+        # temp color
+        temp_col = ('#60a5fa' if rec['temp']<32 else '#94a3b8' if rec['temp']<50 else '' if rec['temp']<70 else 'var(--warn)')
+        temp_style = f'color:{temp_col}' if temp_col else 'color:var(--sub)'
         notes_txt = ' · '.join(
             nn for nn in a['notes']
-            if not any(x in nn for x in ('Sheltered','Exposed','easterly')))[:95]
+            if not any(x in nn for x in ('Sheltered','Exposed','easterly')))[:90]
         shield = ' ⛨' if sh else ''
         sdot   = (' <span style="color:var(--prime);font-size:10px">🌕</span>' if sol_pts>=15 else
                   ' <span style="color:rgba(167,139,250,.5);font-size:10px">🌙</span>' if sol_pts>=7 else '')
@@ -784,22 +874,12 @@ def build_html(weather_json, haikubox_data=None):
         <div class="hr-row {rcls}">
           <div>{icon} {fmt12(rec['hour'])}</div>
           <div><span class="chip {ccls}">{ctxt}</span>{sdot}</div>
+          <div style="{temp_style}">{rec['temp']}°F</div>
           <div class="{wcls}">{eff} mph{shield}</div>
           <div>{wind_arrow(rec['wind_dir'])} {dir_} ({rec['wind']})</div>
           <div style="color:var(--sub)">{rec['cloud']}% ☁</div>
           <div class="hr-notes">{notes_txt}</div>
         </div>"""
-
-    def ext_sessions(hrs):
-        sessions, cur = [], None
-        for r in hrs:
-            if r['analysis']['score'] >= 50:
-                cur = (cur or []) + [r]
-            else:
-                if cur and len(cur)>=2: sessions.append(cur)
-                cur = None
-        if cur and len(cur)>=2: sessions.append(cur)
-        return sessions
 
     days_html = ''
     for ds, hrs in days.items():
@@ -812,7 +892,6 @@ def build_html(weather_json, haikubox_data=None):
         ext       = ext_sessions(light)
         sol_day   = sol_by_day.get(ds, [])
 
-        # Pill colors
         pc = ('#a78bfa' if has_prime else '#2ecc71' if best>=75 else '#c9a84c' if best>=55 else '#e67e22' if best>=35 else '#8fa3b1')
         pb = ('var(--prime-bg)' if has_prime else 'rgba(39,174,96,.15)' if best>=75 else 'rgba(201,168,76,.15)' if best>=55 else 'rgba(255,255,255,.05)')
 
@@ -822,7 +901,6 @@ def build_html(weather_json, haikubox_data=None):
         eagle_pill = f'<span class="pill" style="background:rgba(142,68,173,.15);color:#9b59b6">🦅 Eagle watch</span>' if has_eagle else ''
         blind_pill = f'<span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 {len(ext)} extended session{"s" if len(ext)>1 else ""}</span>' if ext else ''
 
-        # Solunar pill for day header
         sol_parts = [('🌕 ' if w['type']=='major' else '🌙 ') + fmt12f(w['hour_ct']) for w in sol_day]
         sol_pill  = (f'<span class="pill" style="background:var(--prime-bg);color:var(--prime)">'
                      f'{" · ".join(sol_parts)}</span>') if sol_parts else ''
@@ -851,7 +929,7 @@ def build_html(weather_json, haikubox_data=None):
           </div>
           <div class="day-content">
             {sol_banner}{blind_banners}
-            <div class="hr-header"><span>Time</span><span>Score</span><span>Eff. Wind</span>
+            <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             {rows}
           </div>
@@ -862,7 +940,7 @@ def build_html(weather_json, haikubox_data=None):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Lake Koshkonong Bird Photography Planner v2</title>
+<title>Lake Koshkonong Bird Photography Planner v3</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet">
 <style>{css}</style>
 </head>
@@ -870,7 +948,7 @@ def build_html(weather_json, haikubox_data=None):
 <div class="sky-bg"></div>
 <div class="content">
   <header>
-    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v2.0</div>
+    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v3.0</div>
     <h1>Bird Photography<br><em>Session Planner</em></h1>
     <p class="subtitle">7-Day Forecast · Wind · Light · Solunar Tables · Eagle · Haikubox Live</p>
     <div class="legend">
@@ -885,24 +963,29 @@ def build_html(weather_json, haikubox_data=None):
     <div class="status-dot"></div>
     Live data · 7-day forecast · Solunar tables computed · Haikubox live · Generated {generated}
   </div>
-  <div class="sl">Best upcoming sessions</div>
-  <div class="top-picks">{picks_html}</div>
+  <div class="sl">Best upcoming sessions &amp; blind setup windows</div>
+  <div class="top-section">
+    <div class="top-picks">{picks_html}</div>
+    {blind_sidebar_html()}
+  </div>
   <div class="sl">Haikubox · Lake Koshkonong</div>
   {haikubox_html}
   <div class="sl" style="margin-top:16px">7-day hourly forecast</div>
   {days_html}
   <div class="sl" style="margin-top:40px">Scoring guide</div>
   <div class="kg">
-    <div class="kc"><h4>What's New in v2.0</h4><ul>
-      <li>🌕 Solunar tables — major/minor feeding windows from lunar position math</li>
-      <li>🌕 Prime Session tier — golden hour + calm + major solunar all aligned</li>
-      <li>🎙 Haikubox panel — live detections from your Lake Koshkonong device</li>
-      <li>Scoring: light 40 · golden hour 30 · solunar +20 · all normalized to 100</li>
+    <div class="kc"><h4>What's New in v3.0</h4><ul>
+      <li>🧭 West-wind penalty: pure W &lt;5 mph OK; 5–10 mph −15 pts; &gt;10 mph capped at 50 (no GOOD/EXCELLENT)</li>
+      <li>🌡️ Temperature now shown in pick cards and hourly forecast</li>
+      <li>🎭 Blind Setup Windows moved up top alongside Best Sessions</li>
+      <li>Solunar + golden hour prime sessions suppressed under strong W wind</li>
     </ul></div>
     <div class="kc"><h4>Wind Logic</h4><ul>
       <li>Deck faces west over Lake Koshkonong</li>
-      <li>Easterly winds (E, NE, ENE): shielded ~70% — effective wind much lower</li>
-      <li>Western winds (W, NW, SW): full exposure — raw wind applies</li>
+      <li>Pure W wind &lt;5 mph: no penalty — birds still present</li>
+      <li>Pure W wind 5–10 mph: ⚠️ −15 pts — birds may move to far shore</li>
+      <li>Pure W wind &gt;10 mph: 🚫 score capped at 50 — birds likely gone</li>
+      <li>Easterly (E, NE, ENE): shielded ~70% — effective wind much lower</li>
       <li>⛨ = sheltered (easterly wind direction)</li>
     </ul></div>
     <div class="kc"><h4>Solunar Science</h4><ul>
@@ -917,11 +1000,12 @@ def build_html(weather_json, haikubox_data=None):
       <li>55–74 Good — worth setting up same morning</li>
       <li>35–54 Fair — casual observation only</li>
       <li>Wind 40 + Light 40 + Sun 30 + Dry 10 + Solunar 20 → scaled to /100</li>
+      <li>Pure W wind penalty applied after normalization</li>
     </ul></div>
   </div>
   <footer>
     Data: Open-Meteo · Haikubox (Lake Koshkonong) · Solunar tables computed in Python<br>
-    {LAT}°N, {abs(LNG):.4f}°W · Lake Koshkonong, Fort Atkinson WI · v2.0
+    {LAT}°N, {abs(LNG):.4f}°W · Lake Koshkonong, Fort Atkinson WI · v3.0
   </footer>
 </div>
 <script>
@@ -938,7 +1022,7 @@ document.querySelector('.day-header')?.click();
 def main():
     import os
     print("=" * 60)
-    print("  Lake Koshkonong Bird Photography Planner  v2.0")
+    print("  Lake Koshkonong Bird Photography Planner  v3.0")
     print("=" * 60)
     export_mode = '--export' in sys.argv
 
