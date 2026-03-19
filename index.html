@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Lake Koshkonong Bird Photography Planner v3</title>
+<title>Lake Koshkonong Bird Photography Planner v5</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
     :root{--gold:#c9a84c;--pale:#f2e8d5;--sub:#8fa3b1;--good:#27ae60;--warn:#e67e22;--red:#c0392b;
@@ -161,13 +161,28 @@
     .act-lbl{font-size:8px;color:var(--sub);}
     footer{text-align:center;font-size:10px;color:rgba(143,163,177,.4);letter-spacing:.06em;
       padding-top:20px;border-top:1px solid var(--border);}
+
+    /* eBird recent sightings */
+    .eb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:40px;}
+    .eb-card h3{font-family:'Playfair Display',serif;font-size:16px;color:var(--pale);
+      font-weight:400;margin-bottom:4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+    .eb-subtitle{font-size:11px;color:var(--sub);margin-bottom:16px;font-style:italic;}
+    .eb-row{display:flex;align-items:center;gap:10px;padding:6px 0;
+      border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;}
+    .eb-row:last-child{border-bottom:none;}
+    .eb-rank{font-size:10px;color:var(--sub);width:20px;text-align:right;flex-shrink:0;}
+    .eb-name{color:var(--text);flex:1;font-size:12px;}
+    .eb-sci{color:var(--sub);font-size:10px;font-style:italic;flex:1;}
+    .eb-loc{color:var(--sub);font-size:10px;flex:2;text-align:right;}
+    .eb-date{color:var(--gold);font-size:10px;white-space:nowrap;flex-shrink:0;min-width:70px;text-align:right;}
+    .eb-empty{font-size:11px;color:var(--sub);font-style:italic;text-align:center;padding:16px 0;}
     </style>
 </head>
 <body>
 <div class="sky-bg"></div>
 <div class="content">
   <header>
-    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v3.0</div>
+    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v5.0</div>
     <h1>Bird Photography<br><em>Session Planner</em></h1>
     <p class="subtitle">7-Day Forecast · Wind · Light · Solunar Tables · Eagle · Haikubox Live</p>
     <div class="legend">
@@ -180,51 +195,13 @@
   </header>
   <div id="status">
     <div class="status-dot"></div>
-    Live data · 7-day forecast · Solunar tables computed · Haikubox live · Generated Thursday Mar 19, 2026 at 7:01 AM CT
+    Live data · 7-day forecast · Solunar tables computed · Haikubox live · Generated Thursday Mar 19, 2026 at 11:12 AM CT
   </div>
   <div class="sl">Best upcoming sessions &amp; blind setup windows</div>
   <div class="top-section">
     <div class="top-picks">
         <div class="pick-card good">
           <div class="pick-rank">1</div>
-          <div class="pick-badge badge-good">Good</div>
-          <div class="pick-date">Thursday, Mar 19</div>
-          <div class="pick-time">8:00 AM — morning</div>
-          <div class="pick-sun">🌅 6:59 AM &nbsp; 🌇 7:06 PM</div>
-          <div class="sb-wrap">
-            <div class="sb-lbl"><span>Photo Score</span><span style="color:#c9a84c">71/100</span></div>
-            <div class="sb"><div class="sb-fill" style="width:71%;background:#c9a84c"></div></div>
-          </div>
-          <div class="pm">
-            <div class="m"><div class="ml">Temp</div><div class="mv" style="color:#60a5fa">28°F</div></div>
-            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">0.9 mph</div></div>
-            <div class="m"><div class="ml">Cloud Cover</div><div class="mv ">65%</div></div>
-            <div class="m"><div class="ml">Session Length</div><div class="mv ">2+ hrs</div></div>
-          </div>
-          <div class="sol-tag">🌙 Moonrise</div>
-          <div class="pick-notes">Near-calm winds · Sheltered (easterly wind) · Mostly cloudy</div>
-        </div>
-        <div class="pick-card excellent">
-          <div class="pick-rank">2</div>
-          <div class="pick-badge badge-excellent">Excellent</div>
-          <div class="pick-date">Thursday, Mar 19</div>
-          <div class="pick-time">7:00 PM — evening</div>
-          <div class="pick-sun">🌅 6:59 AM &nbsp; 🌇 7:06 PM</div>
-          <div class="sb-wrap">
-            <div class="sb-lbl"><span>Photo Score</span><span style="color:#2ecc71">76/100</span></div>
-            <div class="sb"><div class="sb-fill" style="width:76%;background:#2ecc71"></div></div>
-          </div>
-          <div class="pm">
-            <div class="m"><div class="ml">Temp</div><div class="mv" style="color:#94a3b8">41°F</div></div>
-            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">2.1 mph</div></div>
-            <div class="m"><div class="ml">Cloud Cover</div><div class="mv gv">30%</div></div>
-            <div class="m"><div class="ml">Session Length</div><div class="mv ">1+ hr</div></div>
-          </div>
-          <div class="sol-tag">🌙 Moonset</div>
-          <div class="pick-notes">Near-calm winds · Sheltered (easterly wind) · Partly cloudy · Dramatic golden light possible</div>
-        </div>
-        <div class="pick-card good">
-          <div class="pick-rank">3</div>
           <div class="pick-badge badge-good">Good</div>
           <div class="pick-date">Saturday, Mar 21</div>
           <div class="pick-time">8:00 AM — morning</div>
@@ -235,15 +212,15 @@
           </div>
           <div class="pm">
             <div class="m"><div class="ml">Temp</div><div class="mv" style="color:#94a3b8">36°F</div></div>
-            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">3.0 mph</div></div>
             <div class="m"><div class="ml">Cloud Cover</div><div class="mv gv">31%</div></div>
-            <div class="m"><div class="ml">Session Length</div><div class="mv ">2+ hrs</div></div>
+            <div class="m"><div class="ml">Wind ↓ SSE </div><div class="mv">5 mph</div></div>
+            <div class="m"><div class="ml">Eff. Wind</div><div class="mv gv">3.0 mph</div></div>
           </div>
           
           <div class="pick-notes">Light breeze · Partly cloudy</div>
         </div>
         <div class="pick-card excellent">
-          <div class="pick-rank">4</div>
+          <div class="pick-rank">2</div>
           <div class="pick-badge badge-excellent">Excellent</div>
           <div class="pick-date">Monday, Mar 23</div>
           <div class="pick-time">6:00 PM — evening</div>
@@ -254,42 +231,60 @@
           </div>
           <div class="pm">
             <div class="m"><div class="ml">Temp</div><div class="mv" style="color:#94a3b8">42°F</div></div>
-            <div class="m"><div class="ml">Effective Wind</div><div class="mv gv">5.4 mph</div></div>
             <div class="m"><div class="ml">Cloud Cover</div><div class="mv gv">6%</div></div>
-            <div class="m"><div class="ml">Session Length</div><div class="mv ">2+ hrs</div></div>
+            <div class="m"><div class="ml">Wind ↑ N </div><div class="mv">9 mph</div></div>
+            <div class="m"><div class="ml">Eff. Wind</div><div class="mv gv">5.4 mph</div></div>
           </div>
-          <div class="sol-tag">🌕 Moon overhead</div>
+          <div class="sol-tag">🌕 Moon overhead · 5:24 PM</div>
           <div class="pick-notes">Light breeze · Bright sun</div>
+        </div>
+        <div class="pick-card good">
+          <div class="pick-rank">3</div>
+          <div class="pick-badge badge-good">Good</div>
+          <div class="pick-date">Tuesday, Mar 24</div>
+          <div class="pick-time">6:00 PM — evening</div>
+          <div class="pick-sun">🌅 6:51 AM &nbsp; 🌇 7:12 PM</div>
+          <div class="sb-wrap">
+            <div class="sb-lbl"><span>Photo Score</span><span style="color:#c9a84c">69/100</span></div>
+            <div class="sb"><div class="sb-fill" style="width:69%;background:#c9a84c"></div></div>
+          </div>
+          <div class="pm">
+            <div class="m"><div class="ml">Temp</div><div class="mv" style="color:#94a3b8">45°F</div></div>
+            <div class="m"><div class="ml">Cloud Cover</div><div class="mv ">54%</div></div>
+            <div class="m"><div class="ml">Wind ↙ SSW </div><div class="mv">8 mph</div></div>
+            <div class="m"><div class="ml">Eff. Wind</div><div class="mv gv">4.8 mph</div></div>
+          </div>
+          <div class="sol-tag">🌕 Moon overhead · 6:19 PM</div>
+          <div class="pick-notes">Light breeze · Mostly cloudy</div>
+        </div>
+        <div class="pick-card prime">
+          <div class="pick-rank">4</div>
+          <div class="pick-badge badge-prime">🌕 Prime Session</div>
+          <div class="pick-date">Wednesday, Mar 25</div>
+          <div class="pick-time">7:00 AM — morning</div>
+          <div class="pick-sun">🌅 6:49 AM &nbsp; 🌇 7:13 PM</div>
+          <div class="sb-wrap">
+            <div class="sb-lbl"><span>Photo Score</span><span style="color:#a78bfa">68/100</span></div>
+            <div class="sb"><div class="sb-fill" style="width:68%;background:#a78bfa"></div></div>
+          </div>
+          <div class="pm">
+            <div class="m"><div class="ml">Temp</div><div class="mv" style="color:#94a3b8">38°F</div></div>
+            <div class="m"><div class="ml">Cloud Cover</div><div class="mv ">100%</div></div>
+            <div class="m"><div class="ml">Wind → E </div><div class="mv">7 mph</div></div>
+            <div class="m"><div class="ml">Eff. Wind</div><div class="mv gv">2.1 mph</div></div>
+          </div>
+          <div class="sol-tag">🌕 Moon underfoot · 6:47 AM</div>
+          <div class="pick-notes">Near-calm winds · Sheltered (easterly wind) · Overcast · <strong>🌕 Prime session — golden hour + calm + major solunar aligned</strong></div>
         </div></div>
     <div class="blind-sidebar">
-          <h3>🎭 Blind Setup Windows</h3>
-          <div class="blind-entry">
-              <div class="blind-day">Thursday, Mar 19</div>
-              <div class="blind-window">7:00 AM – 10:00 AM</div>
-              <div class="blind-meta">3 consecutive hrs · Avg wind 2 mph · Best <span style="color:var(--gold)">71/100</span></div>
-            </div><div class="blind-entry">
-              <div class="blind-day">Thursday, Mar 19</div>
-              <div class="blind-window">6:00 PM – 8:00 PM</div>
-              <div class="blind-meta">2 consecutive hrs · Avg wind 5 mph · Best <span style="color:#2ecc71">76/100</span></div>
-            </div><div class="blind-entry">
-              <div class="blind-day">Friday, Mar 20</div>
-              <div class="blind-window">6:00 PM – 8:00 PM</div>
-              <div class="blind-meta">2 consecutive hrs · Avg wind 4 mph · Best <span style="color:var(--gold)">58/100</span></div>
-            </div><div class="blind-entry">
-              <div class="blind-day">Saturday, Mar 21</div>
-              <div class="blind-window">7:00 AM – 10:00 AM</div>
-              <div class="blind-meta">3 consecutive hrs · Avg wind 7 mph · Best <span style="color:var(--gold)">72/100</span></div>
-            </div><div class="blind-entry">
-              <div class="blind-day">Saturday, Mar 21</div>
-              <div class="blind-window">6:00 PM – 8:00 PM</div>
-              <div class="blind-meta">2 consecutive hrs · Avg wind 8 mph · Best <span style="color:var(--gold)">60/100</span></div>
+              <h3>🎭 Blind Setup Windows</h3>
+              <div class="blind-empty">No windows with 8+ consecutive hours of calm wind in forecast</div>
             </div>
-        </div>
   </div>
   <div class="sl">Haikubox · Lake Koshkonong</div>
   <div class="hb-grid">
           <div class="hb-card">
-            <h3>🎙 Recently on your deck <span class="hb-meta">last 24h · 114 detections · 29 species</span></h3>
+            <h3>🎙 Recently on your deck <span class="hb-meta">last 24h · 126 detections · 29 species</span></h3>
             <div class="sp-group">
               <div class="sp-group-label"><span class="sp-group-icon">🦆</span>Waterfowl</div>
               <div class="sp-row">
@@ -297,7 +292,7 @@
               <div class="sp-name">Canada Goose</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#60a5fa;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">3m ago</div>
+              <div class="sp-ago">47m ago</div>
             </div>
             </div><div class="sp-group">
               <div class="sp-group-label"><span class="sp-group-icon">🦩</span>Waders & Shorebirds</div>
@@ -306,22 +301,22 @@
               <div class="sp-name">Killdeer</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#34d399;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">38m ago</div>
+              <div class="sp-ago">12m ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#3</div>
               <div class="sp-name">Virginia Rail</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#34d399;opacity:.8"></div></div>
               <div class="sp-cnt">3</div>
-              <div class="sp-ago">15h ago</div>
+              <div class="sp-ago">1h ago</div>
             </div>
             </div><div class="sp-group">
               <div class="sp-group-label"><span class="sp-group-icon">🕊️</span>Gulls & Terns</div>
               <div class="sp-row">
               <div class="sp-rank">#4</div>
               <div class="sp-name">Ring-billed Gull</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#94a3b8;opacity:.8"></div></div>
-              <div class="sp-cnt">3</div>
-              <div class="sp-ago">14m ago</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#94a3b8;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">39m ago</div>
             </div>
             </div><div class="sp-group">
               <div class="sp-group-label"><span class="sp-group-icon">🐦</span>Woodpeckers</div>
@@ -330,154 +325,154 @@
               <div class="sp-name">Red-bellied Woodpecker</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#fb923c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">7m ago</div>
+              <div class="sp-ago">38m ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#6</div>
               <div class="sp-name">Downy Woodpecker</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#fb923c;opacity:.8"></div></div>
-              <div class="sp-cnt">4</div>
-              <div class="sp-ago">2m ago</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#fb923c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">38m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#7</div>
+              <div class="sp-name">Northern Flicker</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#fb923c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">39m ago</div>
             </div>
             </div><div class="sp-group">
               <div class="sp-group-label"><span class="sp-group-icon">🎵</span>Songbirds & Others</div>
               <div class="sp-row">
-              <div class="sp-rank">#7</div>
-              <div class="sp-name">House Sparrow</div>
+              <div class="sp-rank">#8</div>
+              <div class="sp-name">Red-winged Blackbird</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
               <div class="sp-ago">0m ago</div>
             </div><div class="sp-row">
-              <div class="sp-rank">#8</div>
-              <div class="sp-name">Song Sparrow</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">1m ago</div>
-            </div><div class="sp-row">
               <div class="sp-rank">#9</div>
-              <div class="sp-name">Northern Cardinal</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">4m ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#10</div>
-              <div class="sp-name">Common Grackle</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">5m ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#11</div>
-              <div class="sp-name">White-breasted Nuthatch</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">12m ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#12</div>
-              <div class="sp-name">American Robin</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">21m ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#13</div>
-              <div class="sp-name">American Crow</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">11h ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#14</div>
-              <div class="sp-name">Mourning Dove</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">5</div>
-              <div class="sp-ago">11h ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#15</div>
               <div class="sp-name">American Tree Sparrow</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">12h ago</div>
+              <div class="sp-ago">2m ago</div>
             </div><div class="sp-row">
-              <div class="sp-rank">#16</div>
+              <div class="sp-rank">#10</div>
+              <div class="sp-name">Northern Cardinal</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">11m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#11</div>
+              <div class="sp-name">House Sparrow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">45m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#12</div>
               <div class="sp-name">House Finch</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">12h ago</div>
+              <div class="sp-ago">49m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#13</div>
+              <div class="sp-name">White-breasted Nuthatch</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">52m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#14</div>
+              <div class="sp-name">Common Grackle</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#15</div>
+              <div class="sp-name">Mourning Dove</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#16</div>
+              <div class="sp-name">Song Sparrow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">1h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#17</div>
               <div class="sp-name">Dark-eyed Junco</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">13h ago</div>
+              <div class="sp-ago">1h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#18</div>
-              <div class="sp-name">Red-winged Blackbird</div>
+              <div class="sp-name">American Robin</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">13h ago</div>
+              <div class="sp-ago">1h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#19</div>
-              <div class="sp-name">Ring-necked Pheasant</div>
+              <div class="sp-name">American Crow</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">14h ago</div>
+              <div class="sp-ago">2h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#20</div>
-              <div class="sp-name">Rusty Blackbird</div>
+              <div class="sp-name">Evening Grosbeak</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">5</div>
-              <div class="sp-ago">16h ago</div>
+              <div class="sp-ago">2h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#21</div>
               <div class="sp-name">Blue Jay</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">4</div>
-              <div class="sp-ago">18h ago</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">2h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#22</div>
-              <div class="sp-name">Golden-crowned Kinglet</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">3</div>
-              <div class="sp-ago">20h ago</div>
+              <div class="sp-name">American Goldfinch</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:100%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">5</div>
+              <div class="sp-ago">3h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#23</div>
-              <div class="sp-name">Brown-headed Cowbird</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">3</div>
-              <div class="sp-ago">21h ago</div>
+              <div class="sp-name">Black-capped Chickadee</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">4</div>
+              <div class="sp-ago">1h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#24</div>
+              <div class="sp-name">Common Redpoll</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:80%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">4</div>
+              <div class="sp-ago">3h ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#25</div>
+              <div class="sp-name">White-throated Sparrow</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:60%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">3</div>
+              <div class="sp-ago">34m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#26</div>
+              <div class="sp-name">European Starling</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">2</div>
+              <div class="sp-ago">33m ago</div>
+            </div><div class="sp-row">
+              <div class="sp-rank">#27</div>
               <div class="sp-name">Greater White-fronted Goose</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">2</div>
-              <div class="sp-ago">50m ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#25</div>
-              <div class="sp-name">Evening Grosbeak</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">2</div>
-              <div class="sp-ago">18h ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#26</div>
-              <div class="sp-name">Brewer's Blackbird</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">2</div>
-              <div class="sp-ago">21h ago</div>
-            </div><div class="sp-row">
-              <div class="sp-rank">#27</div>
-              <div class="sp-name">American Goldfinch</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:20%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">1</div>
-              <div class="sp-ago">38m ago</div>
+              <div class="sp-ago">5h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#28</div>
-              <div class="sp-name">Common Redpoll</div>
-              <div class="sp-bar-wrap"><div class="sp-bar" style="width:20%;background:#c9a84c;opacity:.8"></div></div>
-              <div class="sp-cnt">1</div>
-              <div class="sp-ago">17h ago</div>
+              <div class="sp-name">Rusty Blackbird</div>
+              <div class="sp-bar-wrap"><div class="sp-bar" style="width:40%;background:#c9a84c;opacity:.8"></div></div>
+              <div class="sp-cnt">2</div>
+              <div class="sp-ago">20h ago</div>
             </div><div class="sp-row">
               <div class="sp-rank">#29</div>
-              <div class="sp-name">European Starling</div>
+              <div class="sp-name">Cedar Waxwing</div>
               <div class="sp-bar-wrap"><div class="sp-bar" style="width:20%;background:#c9a84c;opacity:.8"></div></div>
               <div class="sp-cnt">1</div>
-              <div class="sp-ago">21h ago</div>
+              <div class="sp-ago">5m ago</div>
             </div>
             </div>
             <div style="margin-top:12px;font-size:10px;color:var(--sub)">
@@ -486,7 +481,7 @@
             </div>
           </div>
           <div class="hb-card">
-            <h3>📊 Peak activity <span class="hb-meta">peak: 6:00 AM</span></h3>
+            <h3>📊 Peak activity <span class="hb-meta">peak: 10:00 AM</span></h3>
             <div class="act-chart"><div class="act-col">
               <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
               <div class="act-lbl">0</div>
@@ -506,22 +501,22 @@
               <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:74px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-bar" style="height:5px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl">6</div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:8px;background:var(--prime)"></div>
+              <div class="act-bar" style="height:28px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:8px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-bar" style="height:23px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:15px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-bar" style="height:48px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:21px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-bar" style="height:74px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:2px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-bar" style="height:16px;background:var(--prime)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
               <div class="act-bar" style="height:4px;background:rgba(201,168,76,.35)"></div>
@@ -533,25 +528,7 @@
               <div class="act-bar" style="height:4px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
-              <div class="act-bar" style="height:11px;background:rgba(201,168,76,.35)"></div>
-              <div class="act-lbl"></div>
-            </div><div class="act-col">
-              <div class="act-bar" style="height:6px;background:rgba(201,168,76,.35)"></div>
-              <div class="act-lbl"></div>
-            </div><div class="act-col">
-              <div class="act-bar" style="height:27px;background:rgba(201,168,76,.35)"></div>
-              <div class="act-lbl"></div>
-            </div><div class="act-col">
-              <div class="act-bar" style="height:34px;background:rgba(201,168,76,.35)"></div>
-              <div class="act-lbl">18</div>
-            </div><div class="act-col">
-              <div class="act-bar" style="height:17px;background:rgba(201,168,76,.35)"></div>
-              <div class="act-lbl"></div>
-            </div><div class="act-col">
-              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
-              <div class="act-lbl"></div>
-            </div><div class="act-col">
-              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-bar" style="height:2px;background:rgba(201,168,76,.35)"></div>
               <div class="act-lbl"></div>
             </div><div class="act-col">
               <div class="act-bar" style="height:2px;background:rgba(201,168,76,.35)"></div>
@@ -559,11 +536,555 @@
             </div><div class="act-col">
               <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
               <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:5px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl">18</div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:7px;background:rgba(201,168,76,.35)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
+            </div><div class="act-col">
+              <div class="act-bar" style="height:2px;background:rgba(255,255,255,.06)"></div>
+              <div class="act-lbl"></div>
             </div></div>
             <div style="margin-top:12px;font-size:10px;color:var(--sub);line-height:1.9">
-              <span style="color:#60a5fa">🦆 1</span> &nbsp;·&nbsp; <span style="color:#34d399">🦩 2</span> &nbsp;·&nbsp; <span style="color:#94a3b8">🕊️ 1</span> &nbsp;·&nbsp; <span style="color:#fb923c">🐦 2</span> &nbsp;·&nbsp; <span style="color:#c9a84c">🎵 23</span><br>
-              114 total detections · last 24 hrs
+              <span style="color:#60a5fa">🦆 1</span> &nbsp;·&nbsp; <span style="color:#34d399">🦩 2</span> &nbsp;·&nbsp; <span style="color:#94a3b8">🕊️ 1</span> &nbsp;·&nbsp; <span style="color:#fb923c">🐦 3</span> &nbsp;·&nbsp; <span style="color:#c9a84c">🎵 22</span><br>
+              126 total detections · last 24 hrs
             </div>
+          </div>
+        </div>
+  <div class="sl" style="margin-top:16px">eBird · Jefferson County sightings</div>
+  <div class="eb-card">
+          <h3>🔭 Birds recently spotted in Jefferson County, WI</h3>
+          <div class="eb-subtitle">Last 7 days · 86 species · via eBird · 26 also on your Haikubox ✅</div>
+          <div class="eb-row">
+              <div class="eb-rank">#1</div>
+              <div class="eb-name" style="color:#2ecc71">American Crow <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Corvus brachyrhynchos</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#2</div>
+              <div class="eb-name" style="color:#2ecc71">Common Grackle <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Quiscalus quiscula</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#3</div>
+              <div class="eb-name" style="color:#2ecc71">European Starling <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Sturnus vulgaris</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#4</div>
+              <div class="eb-name" style="color:#2ecc71">Dark-eyed Junco <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Junco hyemalis</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#5</div>
+              <div class="eb-name" style="color:#2ecc71">Mourning Dove <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Zenaida macroura</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#6</div>
+              <div class="eb-name" style="color:#2ecc71">House Sparrow <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Passer domesticus</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#7</div>
+              <div class="eb-name" style="color:#2ecc71">Black-capped Chickadee <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Poecile atricapillus</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#8</div>
+              <div class="eb-name" style="color:#2ecc71">Blue Jay <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Cyanocitta cristata</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#9</div>
+              <div class="eb-name" style="color:#2ecc71">House Finch <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Haemorhous mexicanus</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#10</div>
+              <div class="eb-name" style="color:#2ecc71">American Robin <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Turdus migratorius</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#11</div>
+              <div class="eb-name" style="color:#2ecc71">Northern Cardinal <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Cardinalis cardinalis</div>
+              <div class="eb-loc">119 North 9th Street, Watertown, WI (Home)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#12</div>
+              <div class="eb-name" style="">Common Goldeneye</div>
+              <div class="eb-sci">Bucephala clangula</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#13</div>
+              <div class="eb-name" style="">Bufflehead</div>
+              <div class="eb-sci">Bucephala albeola</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#14</div>
+              <div class="eb-name" style="">Gadwall</div>
+              <div class="eb-sci">Mareca strepera</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#15</div>
+              <div class="eb-name" style="">Ring-necked Duck</div>
+              <div class="eb-sci">Aythya collaris</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#16</div>
+              <div class="eb-name" style="color:#2ecc71">Canada Goose <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Branta canadensis</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#17</div>
+              <div class="eb-name" style="color:#2ecc71">Ring-billed Gull <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Larus delawarensis</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#18</div>
+              <div class="eb-name" style="">American Coot</div>
+              <div class="eb-sci">Fulica americana</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#19</div>
+              <div class="eb-name" style="">Lesser Scaup</div>
+              <div class="eb-sci">Aythya affinis</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#20</div>
+              <div class="eb-name" style="">Pied-billed Grebe</div>
+              <div class="eb-sci">Podilymbus podiceps</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#21</div>
+              <div class="eb-name" style="">Hooded Merganser</div>
+              <div class="eb-sci">Lophodytes cucullatus</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#22</div>
+              <div class="eb-name" style="">Northern Pintail</div>
+              <div class="eb-sci">Anas acuta</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#23</div>
+              <div class="eb-name" style="">American Wigeon</div>
+              <div class="eb-sci">Mareca americana</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#24</div>
+              <div class="eb-name" style="">Wild Turkey</div>
+              <div class="eb-sci">Meleagris gallopavo</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#25</div>
+              <div class="eb-name" style="">Turkey Vulture</div>
+              <div class="eb-sci">Cathartes aura</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#26</div>
+              <div class="eb-name" style="">Trumpeter Swan</div>
+              <div class="eb-sci">Cygnus buccinator</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#27</div>
+              <div class="eb-name" style="color:#2ecc71">Song Sparrow <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Melospiza melodia</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#28</div>
+              <div class="eb-name" style="">Sandhill Crane</div>
+              <div class="eb-sci">Antigone canadensis</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#29</div>
+              <div class="eb-name" style="">Eastern Bluebird</div>
+              <div class="eb-sci">Sialia sialis</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#30</div>
+              <div class="eb-name" style="color:#2ecc71">Red-winged Blackbird <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Agelaius phoeniceus</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#31</div>
+              <div class="eb-name" style="">Fox Sparrow</div>
+              <div class="eb-sci">Passerella iliaca</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#32</div>
+              <div class="eb-name" style="color:#2ecc71">Red-bellied Woodpecker <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Melanerpes carolinus</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#33</div>
+              <div class="eb-name" style="color:#2ecc71">Greater White-fronted Goose <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Anser albifrons</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#34</div>
+              <div class="eb-name" style="">Hairy Woodpecker</div>
+              <div class="eb-sci">Leuconotopicus villosus</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#35</div>
+              <div class="eb-name" style="">Northern Shoveler</div>
+              <div class="eb-sci">Spatula clypeata</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#36</div>
+              <div class="eb-name" style="">Mallard</div>
+              <div class="eb-sci">Anas platyrhynchos</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#37</div>
+              <div class="eb-name" style="">Northern Harrier</div>
+              <div class="eb-sci">Circus hudsonius</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#38</div>
+              <div class="eb-name" style="color:#2ecc71">Downy Woodpecker <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Dryobates pubescens</div>
+              <div class="eb-loc">Jefferson County, Koshkonong, near the lake - home site</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#39</div>
+              <div class="eb-name" style="color:#2ecc71">American Tree Sparrow <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Spizelloides arborea</div>
+              <div class="eb-loc">Jefferson County, Koshkonong, near the lake - home site</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#40</div>
+              <div class="eb-name" style="color:#2ecc71">White-breasted Nuthatch <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Sitta carolinensis</div>
+              <div class="eb-loc">Lake Mills</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#41</div>
+              <div class="eb-name" style="">Tufted Titmouse</div>
+              <div class="eb-sci">Baeolophus bicolor</div>
+              <div class="eb-loc">1316-1626 Island Road, Palmyra, Wisconsin, US (42.9, -88.607)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#42</div>
+              <div class="eb-name" style="">Horned Lark</div>
+              <div class="eb-sci">Eremophila alpestris</div>
+              <div class="eb-loc">1316-1626 Island Road, Palmyra, Wisconsin, US (42.9, -88.607)</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#43</div>
+              <div class="eb-name" style="">Bald Eagle</div>
+              <div class="eb-sci">Haliaeetus leucocephalus</div>
+              <div class="eb-loc">Hwy E between Watertown & I94</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#44</div>
+              <div class="eb-name" style="">White-crowned Sparrow</div>
+              <div class="eb-sci">Zonotrichia leucophrys</div>
+              <div class="eb-loc">Jefferson County, Koshkonong, near the lake - home site</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#45</div>
+              <div class="eb-name" style="color:#2ecc71">American Goldfinch <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Spinus tristis</div>
+              <div class="eb-loc">Haven Dr</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#46</div>
+              <div class="eb-name" style="">Purple Finch</div>
+              <div class="eb-sci">Haemorhous purpureus</div>
+              <div class="eb-loc">Home Pleasant st</div>
+              <div class="eb-date">Mar 18</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#47</div>
+              <div class="eb-name" style="">American Herring Gull</div>
+              <div class="eb-sci">Larus smithsonianus</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#48</div>
+              <div class="eb-name" style="">Canvasback</div>
+              <div class="eb-sci">Aythya valisineria</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#49</div>
+              <div class="eb-name" style="">Common Merganser</div>
+              <div class="eb-sci">Mergus merganser</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#50</div>
+              <div class="eb-name" style="">Redhead</div>
+              <div class="eb-sci">Aythya americana</div>
+              <div class="eb-loc">Sandy Beach Park</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#51</div>
+              <div class="eb-name" style="color:#2ecc71">Cedar Waxwing <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Bombycilla cedrorum</div>
+              <div class="eb-loc">Lake Mills SWA--Zeloski Marsh</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#52</div>
+              <div class="eb-name" style="">Tree Swallow</div>
+              <div class="eb-sci">Tachycineta bicolor</div>
+              <div class="eb-loc">Home (517 Tower St.)</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#53</div>
+              <div class="eb-name" style="color:#2ecc71">White-throated Sparrow <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Zonotrichia albicollis</div>
+              <div class="eb-loc">Bean Lake SNA</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#54</div>
+              <div class="eb-name" style="">American Kestrel</div>
+              <div class="eb-sci">Falco sparverius</div>
+              <div class="eb-loc">Kaul Park - Ixonia</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#55</div>
+              <div class="eb-name" style="color:#2ecc71">Killdeer <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Charadrius vociferus</div>
+              <div class="eb-loc">Kaul Park - Ixonia</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#56</div>
+              <div class="eb-name" style="">Rock Pigeon</div>
+              <div class="eb-sci">Columba livia</div>
+              <div class="eb-loc">8449 Rock River Road, Ixonia, Wisconsin, US (43.15, -88.568) Kanow Park</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#57</div>
+              <div class="eb-name" style="">Wood Duck</div>
+              <div class="eb-sci">Aix sponsa</div>
+              <div class="eb-loc">8449 Rock River Road, Ixonia, Wisconsin, US (43.15, -88.568) Kanow Park</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#58</div>
+              <div class="eb-name" style="color:#2ecc71">Northern Flicker <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Colaptes auratus</div>
+              <div class="eb-loc">Jefferson County, Koshkonong, near the lake - home site</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#59</div>
+              <div class="eb-name" style="">Golden-crowned Kinglet</div>
+              <div class="eb-sci">Regulus satrapa</div>
+              <div class="eb-loc">Jefferson County, Koshkonong, near the lake - home site</div>
+              <div class="eb-date">Mar 17</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#60</div>
+              <div class="eb-name" style="">Brown-headed Cowbird</div>
+              <div class="eb-sci">Molothrus ater</div>
+              <div class="eb-loc">My home</div>
+              <div class="eb-date">Mar 16</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#61</div>
+              <div class="eb-name" style="">Brown Creeper</div>
+              <div class="eb-sci">Certhia americana</div>
+              <div class="eb-loc">Springer Rd.  Lake Mills</div>
+              <div class="eb-date">Mar 16</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#62</div>
+              <div class="eb-name" style="">Chipping Sparrow</div>
+              <div class="eb-sci">Spizella passerina</div>
+              <div class="eb-loc">Springer Rd.  Lake Mills</div>
+              <div class="eb-date">Mar 16</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#63</div>
+              <div class="eb-name" style="">Eastern Towhee</div>
+              <div class="eb-sci">Pipilo erythrophthalmus</div>
+              <div class="eb-loc">Wisconsin Patch Challenge - Schneider Haus (rural Fort Atkinson)</div>
+              <div class="eb-date">Mar 16</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#64</div>
+              <div class="eb-name" style="">Great Blue Heron</div>
+              <div class="eb-sci">Ardea herodias</div>
+              <div class="eb-loc">Walton's</div>
+              <div class="eb-date">Mar 15</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#65</div>
+              <div class="eb-name" style="">Cooper's Hawk</div>
+              <div class="eb-sci">Astur cooperii</div>
+              <div class="eb-loc">Glacial River Trail--Fort Atkinson</div>
+              <div class="eb-date">Mar 15</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#66</div>
+              <div class="eb-name" style="color:#2ecc71">Rusty Blackbird <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span></div>
+              <div class="eb-sci">Euphagus carolinus</div>
+              <div class="eb-loc">Glacial River Trail--Fort Atkinson</div>
+              <div class="eb-date">Mar 15</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#67</div>
+              <div class="eb-name" style="">Blue-winged Teal</div>
+              <div class="eb-sci">Spatula discors</div>
+              <div class="eb-loc">Rose Lake SNA/Dorothy Carnes Park--west</div>
+              <div class="eb-date">Mar 15</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#68</div>
+              <div class="eb-name" style="">Green-winged Teal</div>
+              <div class="eb-sci">Anas crecca</div>
+              <div class="eb-loc">Rose Lake SNA/Dorothy Carnes Park--west</div>
+              <div class="eb-date">Mar 15</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#69</div>
+              <div class="eb-name" style="">Eastern Meadowlark</div>
+              <div class="eb-sci">Sturnella magna</div>
+              <div class="eb-loc">Rose Lake SNA/Dorothy Carnes Park--west</div>
+              <div class="eb-date">Mar 15</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#70</div>
+              <div class="eb-name" style="">American Woodcock</div>
+              <div class="eb-sci">Scolopax minor</div>
+              <div class="eb-loc">Hilltoppe</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#71</div>
+              <div class="eb-name" style="">Red-tailed Hawk</div>
+              <div class="eb-sci">Buteo jamaicensis</div>
+              <div class="eb-loc">My home</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#72</div>
+              <div class="eb-name" style="">Ring-necked Pheasant</div>
+              <div class="eb-sci">Phasianus colchicus</div>
+              <div class="eb-loc">Lake Mills SWA--Hwy. A</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#73</div>
+              <div class="eb-name" style="">American Black Duck</div>
+              <div class="eb-sci">Anas rubripes</div>
+              <div class="eb-loc">N9603–N9699 N River Rd, Ixonia US-WI 43.19301, -88.54923</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#74</div>
+              <div class="eb-name" style="">Red-breasted Merganser</div>
+              <div class="eb-sci">Mergus serrator</div>
+              <div class="eb-loc">Korth Park</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#75</div>
+              <div class="eb-name" style="">Red-breasted Nuthatch</div>
+              <div class="eb-sci">Sitta canadensis</div>
+              <div class="eb-loc">Home (517 Tower St.)</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#76</div>
+              <div class="eb-name" style="">Ruddy Duck</div>
+              <div class="eb-sci">Oxyura jamaicensis</div>
+              <div class="eb-loc">Lake Koshkonong--Bingham Rd. Boat Launch (Jefferson Co.)</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#77</div>
+              <div class="eb-name" style="">American White Pelican</div>
+              <div class="eb-sci">Pelecanus erythrorhynchos</div>
+              <div class="eb-loc">Lake Koshkonong--Kuehn Rd. Boat Launch</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#78</div>
+              <div class="eb-name" style="">Pileated Woodpecker</div>
+              <div class="eb-sci">Dryocopus pileatus</div>
+              <div class="eb-loc">Glacial Drumlin State Trail, Lake Mills US-WI (43.0499,-89.0038)</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#79</div>
+              <div class="eb-name" style="">Wilson's Snipe</div>
+              <div class="eb-sci">Gallinago delicata</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#80</div>
+              <div class="eb-name" style="">Red-shouldered Hawk</div>
+              <div class="eb-sci">Buteo lineatus</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#81</div>
+              <div class="eb-name" style="">Northern Shrike</div>
+              <div class="eb-sci">Lanius borealis</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#82</div>
+              <div class="eb-name" style="">Mallard x American Black Duck (hybrid)</div>
+              <div class="eb-sci">Anas platyrhynchos x rubripes</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#83</div>
+              <div class="eb-name" style="">Snow Goose</div>
+              <div class="eb-sci">Anser caerulescens</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#84</div>
+              <div class="eb-name" style="">Lapland Longspur</div>
+              <div class="eb-sci">Calcarius lapponicus</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#85</div>
+              <div class="eb-name" style="">Tundra Swan</div>
+              <div class="eb-sci">Cygnus columbianus</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div><div class="eb-row">
+              <div class="eb-rank">#86</div>
+              <div class="eb-name" style="">Brewer's Blackbird</div>
+              <div class="eb-sci">Euphagus cyanocephalus</div>
+              <div class="eb-loc">Prince’s Point SWA--Hwy. 106</div>
+              <div class="eb-date">Mar 14</div>
+            </div>
+          <div style="margin-top:12px;font-size:10px;color:var(--sub)">
+            <a href="https://ebird.org/region/US-WI-055?yr=cur&m=" target="_blank"
+               style="color:var(--gold);text-decoration:none">View all Jefferson County sightings on eBird →</a>
           </div>
         </div>
   <div class="sl" style="margin-top:16px">7-day hourly forecast</div>
@@ -572,71 +1093,71 @@
           <div class="day-header" onclick="toggleDay(this)">
             <div><div class="day-name">Thursday</div><div class="day-sub">Mar 19</div></div>
             <div class="day-sum">
-              <span class="pill" style="background:rgba(39,174,96,.15);color:#2ecc71">Best: 76/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:59 AM &nbsp;🌇 7:06 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 1:13 AM · 🌙 7:27 AM · 🌕 1:41 PM · 🌙 7:54 PM</span>
-              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 3 mph</span>
-              <span class="pill" style="background:rgba(142,68,173,.15);color:#9b59b6">🦅 Eagle watch</span><span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 2 extended sessions</span>
+              <span class="pill" style="background:rgba(39,174,96,.15);color:#2ecc71">Best: 89/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:59 AM &nbsp;🌇 7:06 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 4 mph</span>
+              <span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 2 extended sessions</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌕 1:13 AM &nbsp;·&nbsp; 🌙 7:27 AM &nbsp;·&nbsp; 🌕 1:41 PM &nbsp;·&nbsp; 🌙 7:54 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 10:00 AM · 3 consecutive hrs ≥50 · Avg wind 2 mph</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 6:00 PM – 8:00 PM · 2 consecutive hrs ≥50 · Avg wind 5 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌕 Moon underfoot · 1:13 AM &nbsp;·&nbsp; 🌙 Moonrise · 7:27 AM &nbsp;·&nbsp; 🌕 Moon overhead · 1:41 PM &nbsp;·&nbsp; 🌙 Moonset · 7:54 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
         <div class="hr-row hl">
           <div>🌅 7:00 AM</div>
           <div><span class="chip c-gd">Good</span></div>
-          <div style="color:#60a5fa">28°F</div>
-          <div class="wg">1.2 mph</div>
-          <div>↓ SSE (2)</div>
+          <div style="color:#94a3b8">32°F</div>
+          <div class="wg">3.0 mph</div>
+          <div>↙ SW (3)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Near-calm winds · Overcast · 🌙 Moonrise</div>
+          <div class="hr-notes">Light breeze · Overcast · 🌙 Moonrise</div>
         </div>
-        <div class="hr-row hl">
+        <div class="hr-row exc">
           <div>☀️ 8:00 AM</div>
-          <div><span class="chip c-gd">Good</span></div>
-          <div style="color:#60a5fa">28°F</div>
-          <div class="wg">0.9 mph ⛨</div>
-          <div>→ E (3)</div>
-          <div style="color:var(--sub)">65% ☁</div>
-          <div class="hr-notes">Near-calm winds · Mostly cloudy · 🌙 Moonrise</div>
-        </div>
-        <div class="hr-row eg">
-          <div>☀️ 9:00 AM</div>
-          <div><span class="chip c-eg">🦅 Eagle</span></div>
+          <div><span class="chip c-exc">Excellent</span></div>
           <div style="color:#94a3b8">33°F</div>
-          <div class="wg">0.3 mph ⛨</div>
-          <div>→ E (1)</div>
-          <div style="color:var(--sub)">2% ☁</div>
+          <div class="wg">0.6 mph</div>
+          <div>↓ S (1)</div>
+          <div style="color:var(--sub)">3% ☁</div>
+          <div class="hr-notes">Near-calm winds · Bright sun · 🌙 Moonrise</div>
+        </div>
+        <div class="hr-row ">
+          <div>☀️ 9:00 AM</div>
+          <div><span class="chip c-fr">Fair</span></div>
+          <div style="color:#94a3b8">36°F</div>
+          <div class="wg">0.6 mph ⛨</div>
+          <div>↘ SE (2)</div>
+          <div style="color:var(--sub)">11% ☁</div>
           <div class="hr-notes">Near-calm winds · Bright sun</div>
         </div>
         <div class="hr-row ">
           <div>🌤 5:00 PM</div>
           <div><span class="chip c-fr">Fair</span></div>
-          <div style="color:#94a3b8">46°F</div>
-          <div class="wg">0.6 mph ⛨</div>
-          <div>↗ NE (2)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Near-calm winds · Overcast</div>
+          <div style="color:#94a3b8">47°F</div>
+          <div class="wg">1.5 mph ⛨</div>
+          <div>↘ SE (5)</div>
+          <div style="color:var(--sub)">55% ☁</div>
+          <div class="hr-notes">Near-calm winds · Mostly cloudy</div>
         </div>
         <div class="hr-row hl">
           <div>🌤 6:00 PM</div>
           <div><span class="chip c-gd">Good</span></div>
-          <div style="color:#94a3b8">44°F</div>
-          <div class="wg">0.9 mph ⛨</div>
-          <div>→ ESE (3)</div>
+          <div style="color:#94a3b8">45°F</div>
+          <div class="wg">1.8 mph ⛨</div>
+          <div>↘ SE (6)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Near-calm winds · Overcast</div>
         </div>
-        <div class="hr-row exc">
+        <div class="hr-row hl">
           <div>🌇 7:00 PM</div>
-          <div><span class="chip c-exc">Excellent</span></div>
-          <div style="color:#94a3b8">41°F</div>
-          <div class="wg">2.1 mph ⛨</div>
-          <div>↘ SE (7)</div>
-          <div style="color:var(--sub)">30% ☁</div>
-          <div class="hr-notes">Near-calm winds · Partly cloudy · Dramatic golden light possible · 🌙 Moonset</div>
+          <div><span class="chip c-gd">Good</span></div>
+          <div style="color:#94a3b8">42°F</div>
+          <div class="wg">1.8 mph ⛨</div>
+          <div>↘ SE (6)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Near-calm winds · Overcast · 🌙 Moonset</div>
         </div>
           </div>
         </div>
@@ -644,69 +1165,69 @@
           <div class="day-header" onclick="toggleDay(this)">
             <div><div class="day-name">Friday</div><div class="day-sub">Mar 20</div></div>
             <div class="day-sum">
-              <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 58/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:57 AM &nbsp;🌇 7:07 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 2:08 AM · 🌙 8:22 AM · 🌕 2:36 PM · 🌙 8:50 PM</span>
-              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 8 mph</span>
+              <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 59/100</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:57 AM &nbsp;🌇 7:07 PM</span>
+              <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 7 mph</span>
               <span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌕 2:08 AM &nbsp;·&nbsp; 🌙 8:22 AM &nbsp;·&nbsp; 🌕 2:36 PM &nbsp;·&nbsp; 🌙 8:50 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 6:00 PM – 8:00 PM · 2 consecutive hrs ≥50 · Avg wind 4 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌕 Moon underfoot · 2:08 AM &nbsp;·&nbsp; 🌙 Moonrise · 8:22 AM &nbsp;·&nbsp; 🌕 Moon overhead · 2:36 PM &nbsp;·&nbsp; 🌙 Moonset · 8:50 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
         <div class="hr-row ">
           <div>🌅 7:00 AM</div>
           <div><span class="chip c-fr">Fair</span></div>
-          <div style="color:#94a3b8">41°F</div>
+          <div style="color:#94a3b8">42°F</div>
           <div class="ww">9.0 mph</div>
-          <div>← W (9)</div>
+          <div>← WSW (9)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">⚠️ W wind — birds may move to far shore · Overcast</div>
+          <div class="hr-notes">Overcast</div>
         </div>
-        <div class="hr-row ">
+        <div class="hr-row hl">
           <div>☀️ 8:00 AM</div>
-          <div><span class="chip c-fr">Fair</span></div>
-          <div style="color:#94a3b8">43°F</div>
-          <div class="ww">9.0 mph</div>
-          <div>↙ WSW (9)</div>
+          <div><span class="chip c-gd">Good</span></div>
+          <div style="color:#94a3b8">42°F</div>
+          <div class="wg">4.0 mph</div>
+          <div>← WSW (4)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Overcast · 🌙 Moonrise</div>
+          <div class="hr-notes">Light breeze · Overcast · 🌙 Moonrise</div>
         </div>
         <div class="hr-row ">
           <div>☀️ 9:00 AM</div>
           <div><span class="chip c-po">—</span></div>
-          <div style="color:#94a3b8">47°F</div>
-          <div class="ww">10.0 mph</div>
-          <div>← WSW (10)</div>
+          <div style="color:#94a3b8">46°F</div>
+          <div class="ww">9.0 mph</div>
+          <div>↖ NW (9)</div>
           <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Moderate wind · Overcast · 🌙 Moonrise</div>
+          <div class="hr-notes">Overcast · 🌙 Moonrise</div>
         </div>
         <div class="hr-row ">
           <div>🌤 5:00 PM</div>
-          <div><span class="chip c-po">—</span></div>
-          <div style="color:var(--sub)">57°F</div>
-          <div class="ww">8.0 mph</div>
-          <div>↖ NNW (8)</div>
-          <div style="color:var(--sub)">100% ☁</div>
-          <div class="hr-notes">Overcast</div>
-        </div>
-        <div class="hr-row ">
-          <div>🌤 6:00 PM</div>
           <div><span class="chip c-fr">Fair</span></div>
-          <div style="color:var(--sub)">55°F</div>
-          <div class="wg">3.6 mph</div>
-          <div>↑ N (6)</div>
+          <div style="color:#94a3b8">44°F</div>
+          <div class="wg">4.8 mph</div>
+          <div>↑ N (8)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
         <div class="hr-row hl">
+          <div>🌤 6:00 PM</div>
+          <div><span class="chip c-gd">Good</span></div>
+          <div style="color:#94a3b8">43°F</div>
+          <div class="wg">2.1 mph ⛨</div>
+          <div>↑ NNE (7)</div>
+          <div style="color:var(--sub)">100% ☁</div>
+          <div class="hr-notes">Near-calm winds · Overcast</div>
+        </div>
+        <div class="hr-row hl">
           <div>🌇 7:00 PM</div>
           <div><span class="chip c-gd">Good</span></div>
-          <div style="color:var(--sub)">52°F</div>
-          <div class="wg">0.9 mph ⛨</div>
-          <div>↑ NNE (3)</div>
+          <div style="color:#94a3b8">42°F</div>
+          <div class="wg">1.8 mph ⛨</div>
+          <div>↑ NNE (6)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Near-calm winds · Overcast</div>
         </div>
@@ -717,23 +1238,23 @@
             <div><div class="day-name">Saturday</div><div class="day-sub">Mar 21</div></div>
             <div class="day-sum">
               <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 72/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:56 AM &nbsp;🌇 7:08 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 3:04 AM · 🌙 9:18 AM · 🌕 3:32 PM · 🌙 9:46 PM</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:56 AM &nbsp;🌇 7:08 PM</span>
               <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 8 mph</span>
               <span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 2 extended sessions</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌕 3:04 AM &nbsp;·&nbsp; 🌙 9:18 AM &nbsp;·&nbsp; 🌕 3:32 PM &nbsp;·&nbsp; 🌙 9:46 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 10:00 AM · 3 consecutive hrs ≥50 · Avg wind 7 mph</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 6:00 PM – 8:00 PM · 2 consecutive hrs ≥50 · Avg wind 8 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌕 Moon underfoot · 3:04 AM &nbsp;·&nbsp; 🌙 Moonrise · 9:18 AM &nbsp;·&nbsp; 🌕 Moon overhead · 3:32 PM &nbsp;·&nbsp; 🌙 Moonset · 9:46 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
         <div class="hr-row ">
           <div>🌅 7:00 AM</div>
           <div><span class="chip c-fr">Fair</span></div>
-          <div style="color:#94a3b8">35°F</div>
-          <div class="wg">4.2 mph</div>
-          <div>↘ SSE (7)</div>
+          <div style="color:#94a3b8">36°F</div>
+          <div class="wg">3.6 mph</div>
+          <div>↓ SSE (6)</div>
           <div style="color:var(--sub)">100% ☁</div>
           <div class="hr-notes">Light breeze · Overcast</div>
         </div>
@@ -789,14 +1310,14 @@
             <div><div class="day-name">Sunday</div><div class="day-sub">Mar 22</div></div>
             <div class="day-sum">
               <span class="pill" style="background:rgba(255,255,255,.05);color:#e67e22">Best: 51/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:54 AM &nbsp;🌇 7:09 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 4:00 AM · 🌙 10:14 AM · 🌕 4:28 PM · 🌙 10:42 PM</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:54 AM &nbsp;🌇 7:09 PM</span>
               <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 16 mph</span>
               <span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌕 4:00 AM &nbsp;·&nbsp; 🌙 10:14 AM &nbsp;·&nbsp; 🌕 4:28 PM &nbsp;·&nbsp; 🌙 10:42 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 9:00 AM · 2 consecutive hrs ≥50 · Avg wind 13 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌕 Moon underfoot · 4:00 AM &nbsp;·&nbsp; 🌙 Moonrise · 10:14 AM &nbsp;·&nbsp; 🌕 Moon overhead · 4:28 PM &nbsp;·&nbsp; 🌙 Moonset · 10:42 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
@@ -861,14 +1382,14 @@
             <div><div class="day-name">Monday</div><div class="day-sub">Mar 23</div></div>
             <div class="day-sum">
               <span class="pill" style="background:rgba(39,174,96,.15);color:#2ecc71">Best: 80/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:52 AM &nbsp;🌇 7:11 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 4:56 AM · 🌙 11:10 AM · 🌕 5:24 PM · 🌙 11:38 PM</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:52 AM &nbsp;🌇 7:11 PM</span>
               <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 10 mph</span>
               <span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 1 extended session</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌕 4:56 AM &nbsp;·&nbsp; 🌙 11:10 AM &nbsp;·&nbsp; 🌕 5:24 PM &nbsp;·&nbsp; 🌙 11:38 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 6:00 PM – 8:00 PM · 2 consecutive hrs ≥50 · Avg wind 8 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌕 Moon underfoot · 4:56 AM &nbsp;·&nbsp; 🌙 Moonrise · 11:10 AM &nbsp;·&nbsp; 🌕 Moon overhead · 5:24 PM &nbsp;·&nbsp; 🌙 Moonset · 11:38 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
@@ -933,14 +1454,14 @@
             <div><div class="day-name">Tuesday</div><div class="day-sub">Mar 24</div></div>
             <div class="day-sum">
               <span class="pill" style="background:rgba(201,168,76,.15);color:#c9a84c">Best: 69/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:51 AM &nbsp;🌇 7:12 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 5:52 AM · 🌙 12:05 PM · 🌕 6:19 PM</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:51 AM &nbsp;🌇 7:12 PM</span>
               <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 9 mph</span>
               <span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 2 extended sessions</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌕 5:52 AM &nbsp;·&nbsp; 🌙 12:05 PM &nbsp;·&nbsp; 🌕 6:19 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 9:00 AM · 2 consecutive hrs ≥50 · Avg wind 10 mph</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 6:00 PM – 8:00 PM · 2 consecutive hrs ≥50 · Avg wind 7 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌕 Moon underfoot · 5:52 AM &nbsp;·&nbsp; 🌙 Moonrise · 12:05 PM &nbsp;·&nbsp; 🌕 Moon overhead · 6:19 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
@@ -1005,14 +1526,14 @@
             <div><div class="day-name">Wednesday</div><div class="day-sub">Mar 25</div></div>
             <div class="day-sum">
               <span class="pill" style="background:var(--prime-bg);color:#a78bfa">Best: 68/100</span>
-              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:49 AM &nbsp;🌇 7:13 PM</span><span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌙 12:33 AM · 🌕 6:47 AM · 🌙 1:00 PM · 🌕 7:14 PM</span>
+              <span class="pill" style="background:rgba(201,168,76,.08);color:var(--gold)">🌅 6:49 AM &nbsp;🌇 7:13 PM</span>
               <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: 13 mph</span>
               <span class="pill" style="background:var(--prime-bg);color:var(--prime)">🌕 Prime session</span><span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 2 extended sessions</span>
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            <div class="sol-banner">🌕 Solunar windows: 🌙 12:33 AM &nbsp;·&nbsp; 🌕 6:47 AM &nbsp;·&nbsp; 🌙 1:00 PM &nbsp;·&nbsp; 🌕 7:14 PM</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 7:00 AM – 9:00 AM · 2 consecutive hrs ≥50 · Avg wind 8 mph</div><div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> 6:00 PM – 8:00 PM · 2 consecutive hrs ≥50 · Avg wind 18 mph</div>
+            <div class="sol-banner">🌕 Solunar windows: 🌙 Moonset · 12:33 AM &nbsp;·&nbsp; 🌕 Moon underfoot · 6:47 AM &nbsp;·&nbsp; 🌙 Moonrise · 1:00 PM &nbsp;·&nbsp; 🌕 Moon overhead · 7:14 PM</div>
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             
@@ -1074,11 +1595,11 @@
         </div>
   <div class="sl" style="margin-top:40px">Scoring guide</div>
   <div class="kg">
-    <div class="kc"><h4>What's New in v3.0</h4><ul>
-      <li>🧭 West-wind penalty: pure W &lt;5 mph OK; 5–10 mph −15 pts; &gt;10 mph capped at 50 (no GOOD/EXCELLENT)</li>
-      <li>🌡️ Temperature now shown in pick cards and hourly forecast</li>
-      <li>🎭 Blind Setup Windows moved up top alongside Best Sessions</li>
-      <li>Solunar + golden hour prime sessions suppressed under strong W wind</li>
+    <div class="kc"><h4>What's New in v5.0</h4><ul>
+      <li>🔭 eBird recent sightings added — Jefferson County WI, last 7 days, filtered against Haikubox species</li>
+      <li>🎭 Blind Setup Windows now only shown when 8+ consecutive hours of eff. wind ≤5 mph</li>
+      <li>📅 7-day forecast headers cleaned up — solunar info removed (available in hourly detail)</li>
+      <li>Previous: Session Length replaced by Actual Wind + Effective Wind in pick cards</li>
     </ul></div>
     <div class="kc"><h4>Wind Logic</h4><ul>
       <li>Deck faces west over Lake Koshkonong</li>
@@ -1104,8 +1625,8 @@
     </ul></div>
   </div>
   <footer>
-    Data: Open-Meteo · Haikubox (Lake Koshkonong) · Solunar tables computed in Python<br>
-    42.9136°N, 88.8601°W · Lake Koshkonong, Fort Atkinson WI · v3.0
+    Data: Open-Meteo · Haikubox (Lake Koshkonong) · eBird (Jefferson County WI) · Solunar tables computed in Python<br>
+    42.9136°N, 88.8601°W · Lake Koshkonong, Fort Atkinson WI · v5.0
   </footer>
 </div>
 <script>
