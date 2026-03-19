@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """
-Lake Koshkonong Bird Photography Session Planner  v3.0
+Lake Koshkonong Bird Photography Session Planner  v4.0
 ======================================================
-New in v3.0:
-  * West-wind penalty logic -- pure W direction only "calm" below 5 mph;
-    5-10 mph W deducts points; >10 mph W caps/eliminates GOOD or EXCELLENT
-  * Temperature shown in Best Upcoming Sessions pick cards
-  * Temperature shown in 7-day hourly forecast rows
-  * Blind Setup Window moved up top alongside Best Upcoming Sessions
+New in v4.0:
+  * Best Sessions cards: Session Length removed; Cloud Cover next to Temp;
+    Actual Wind speed+direction box added; Effective Wind box added
+  * Solunar events in pick cards now show event time (e.g. Moonset · 6:42 AM)
+  * Solunar events in 7-day header pills now include times
+  * Blind Setup sidebar: start time + hours eff. wind stays ≤5 mph;
+    flags ≥12 hrs as worth setup; 24h/48h+ windows noted
+  * Blind Setup banners removed from 7-day hourly forecast (shown up top only)
 """
 
 import json
@@ -308,18 +310,61 @@ def fetch_weather():
            f"&daily=sunrise,sunset"
            f"&wind_speed_unit=mph&temperature_unit=fahrenheit"
            f"&timezone=America%2FChicago&forecast_days=7")
-    req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/3.0"})
+    req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/4.0"})
     with urllib.request.urlopen(req, timeout=15) as r:
         return json.loads(r.read().decode())
 
 def fetch_haikubox(hours=24):
     url = f"https://api.haikubox.com/haikubox/{HAIKUBOX_ID}/detections?hours={hours}"
     try:
-        req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/3.0"})
+        req = urllib.request.Request(url, headers={"User-Agent": "BirdPlanner/4.0"})
         with urllib.request.urlopen(req, timeout=10) as r:
             return json.loads(r.read().decode())
     except Exception as e:
         print(f"  ⚠️  Haikubox: {e}")
+        return None
+
+# Jefferson County, WI eBird region code
+EBIRD_REGION = "US-WI-055"
+
+def _load_ebird_key():
+    """
+    Reads eBird API key from ~/bird_planner.conf (one line: EBIRD_KEY=xxxx).
+    Get a free key instantly at: https://ebird.org/api/keygen
+    """
+    import os
+    conf = os.path.expanduser("~/bird_planner.conf")
+    if os.path.exists(conf):
+        with open(conf) as f:
+            for line in f:
+                line = line.strip()
+                if line.startswith("EBIRD_KEY="):
+                    key = line.split("=", 1)[1].strip()
+                    if key:
+                        return key
+    return None
+
+EBIRD_API_KEY = _load_ebird_key()
+
+def fetch_ebird(days=7, max_results=100):
+    """Fetch recent observations from Jefferson County WI via eBird API."""
+    if not EBIRD_API_KEY:
+        print("  ⚠️  eBird: No API key found.")
+        print("       1. Get a free key at: https://ebird.org/api/keygen")
+        print("       2. Create the file: ~/bird_planner.conf")
+        print("       3. Add one line:    EBIRD_KEY=your_key_here")
+        return None
+    url = (f"https://api.ebird.org/v2/data/obs/{EBIRD_REGION}/recent"
+           f"?back={days}&maxResults={max_results}&includeProvisional=true")
+    try:
+        req = urllib.request.Request(url, headers={
+            "User-Agent": "BirdPlanner/5.0",
+            "X-eBirdApiToken": EBIRD_API_KEY,
+        })
+        with urllib.request.urlopen(req, timeout=10) as r:
+            return json.loads(r.read().decode())
+    except Exception as e:
+        print(f"  ⚠️  eBird: {e}")
         return None
 
 def process_haikubox(data):
@@ -378,7 +423,7 @@ def wind_arrow(deg):
     return WIND_ARROWS[round(((deg+180)%360)/45)%8]
 
 # ── HTML builder ──────────────────────────────────────────────────────────────
-def build_html(weather_json, haikubox_data=None):
+def build_html(weather_json, haikubox_data=None, ebird_data=None):
     h = weather_json['hourly']
     d = weather_json['daily']
     n = len(h['time'])
@@ -637,6 +682,21 @@ def build_html(weather_json, haikubox_data=None):
     .act-lbl{font-size:8px;color:var(--sub);}
     footer{text-align:center;font-size:10px;color:rgba(143,163,177,.4);letter-spacing:.06em;
       padding-top:20px;border-top:1px solid var(--border);}
+
+    /* eBird recent sightings */
+    .eb-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:20px;margin-bottom:40px;}
+    .eb-card h3{font-family:'Playfair Display',serif;font-size:16px;color:var(--pale);
+      font-weight:400;margin-bottom:4px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;}
+    .eb-subtitle{font-size:11px;color:var(--sub);margin-bottom:16px;font-style:italic;}
+    .eb-row{display:flex;align-items:center;gap:10px;padding:6px 0;
+      border-bottom:1px solid rgba(255,255,255,.03);font-size:12px;}
+    .eb-row:last-child{border-bottom:none;}
+    .eb-rank{font-size:10px;color:var(--sub);width:20px;text-align:right;flex-shrink:0;}
+    .eb-name{color:var(--text);flex:1;font-size:12px;}
+    .eb-sci{color:var(--sub);font-size:10px;font-style:italic;flex:1;}
+    .eb-loc{color:var(--sub);font-size:10px;flex:2;text-align:right;}
+    .eb-date{color:var(--gold);font-size:10px;white-space:nowrap;flex-shrink:0;min-width:70px;text-align:right;}
+    .eb-empty{font-size:11px;color:var(--sub);font-style:italic;text-align:center;padding:16px 0;}
     """
 
     # ── Haikubox panel ────────────────────────────────────────────────────────
@@ -771,6 +831,85 @@ def build_html(weather_json, haikubox_data=None):
 
     haikubox_html = hb_panel()
 
+    # ── eBird recent sightings panel ──────────────────────────────────────────
+    def ebird_panel(ebird_data):
+        if not ebird_data:
+            no_key_msg = (
+                'eBird API key not configured. '
+                'Get a free key at <a href="https://ebird.org/api/keygen" target="_blank" '
+                'style="color:var(--gold)">ebird.org/api/keygen</a>, '
+                'then create <code style="color:var(--text)">~/bird_planner.conf</code> '
+                'containing one line: <code style="color:var(--gold)">EBIRD_KEY=your_key_here</code>'
+                if not EBIRD_API_KEY else
+                'eBird data unavailable — check your internet connection or API key.'
+            )
+            return f"""<div class="eb-card">
+              <h3>🔭 Birds recently spotted in Jefferson County, WI</h3>
+              <div class="eb-subtitle">Last 7 days · via eBird · ✅ = also detected by your Haikubox</div>
+              <div class="eb-empty">{no_key_msg}</div>
+            </div>"""
+
+        # Build set of species detected by Haikubox for cross-reference highlighting
+        hb_species = {sp['name'].lower() for sp in species_list}
+
+        # Deduplicate eBird results by common name, keep most recent sighting
+        seen_eb = {}
+        for obs in ebird_data:
+            cn = obs.get('comName', '').strip()
+            if not cn: continue
+            date_str = obs.get('obsDt', '')
+            if cn not in seen_eb or date_str > seen_eb[cn]['obsDt']:
+                seen_eb[cn] = obs
+
+        # Sort by most recent observation date, show all
+        all_obs = sorted(seen_eb.values(), key=lambda x: x.get('obsDt',''), reverse=True)
+
+        if not all_obs:
+            return f"""<div class="eb-card">
+              <h3>🔭 Birds recently spotted in Jefferson County, WI</h3>
+              <div class="eb-subtitle">Last 7 days · via eBird · ✅ = also detected by your Haikubox</div>
+              <div class="eb-empty">No recent eBird sightings found for Jefferson County.</div>
+            </div>"""
+
+        def fmt_obs_date(s):
+            try:
+                dt = datetime.strptime(s[:10], "%Y-%m-%d")
+                return dt.strftime("%b %-d")
+            except Exception:
+                return s[:10]
+
+        rows_html = ''
+        for i, obs in enumerate(all_obs):
+            cn       = obs.get('comName', 'Unknown')
+            sn       = obs.get('sciName', '')
+            loc_name = obs.get('locName', '')
+            obs_dt   = obs.get('obsDt', '')
+            in_hb    = cn.lower() in hb_species
+            hb_badge = ' <span style="color:#2ecc71;font-size:10px" title="Also detected by your Haikubox">✅</span>' if in_hb else ''
+            name_col = 'color:#2ecc71' if in_hb else ''
+            rows_html += f"""<div class="eb-row">
+              <div class="eb-rank">#{i+1}</div>
+              <div class="eb-name" style="{name_col}">{cn}{hb_badge}</div>
+              <div class="eb-sci">{sn}</div>
+              <div class="eb-loc">{loc_name}</div>
+              <div class="eb-date">{fmt_obs_date(obs_dt)}</div>
+            </div>"""
+
+        hb_count = sum(1 for obs in all_obs if obs.get('comName','').lower() in hb_species)
+        match_note = f' · {hb_count} also on your Haikubox ✅' if hb_count else ''
+
+        return f"""<div class="eb-card">
+          <h3>🔭 Birds recently spotted in Jefferson County, WI</h3>
+          <div class="eb-subtitle">Last 7 days · {len(all_obs)} species · via eBird{match_note}</div>
+          {rows_html}
+          <div style="margin-top:12px;font-size:10px;color:var(--sub)">
+            <a href="https://ebird.org/region/{EBIRD_REGION}?yr=cur&m=" target="_blank"
+               style="color:var(--gold);text-decoration:none">View all Jefferson County sightings on eBird →</a>
+          </div>
+        </div>"""
+
+    ebird_html = ebird_panel(ebird_data)
+
     # ── Pick cards ────────────────────────────────────────────────────────────
     def pick_card(rank, rec):
         a   = rec['analysis']
@@ -783,21 +922,24 @@ def build_html(weather_json, haikubox_data=None):
         scol = '#a78bfa' if isp else '#2ecc71' if sc>=75 else '#c9a84c' if sc>=55 else '#e67e22'
         sd   = sun.get(rec['ds'], {})
         sun_line = f'🌅 {fmt_ampm(sd.get("rise_str","06:00"))} &nbsp; 🌇 {fmt_ampm(sd.get("set_str","18:00"))}'
-        day_hrs = days.get(rec['ds'], [])
-        try:    idx = next(i for i,r in enumerate(day_hrs) if r['dt']==rec['dt'])
-        except: idx = 0
-        sess_len = 0
-        for r in day_hrs[idx:]:
-            if r['analysis']['score'] >= 50: sess_len += 1
-            else: break
         sol_pts, sol_lbl = solunar_score(float(rec['hour']), sol_by_day.get(rec['ds'], []))
-        sol_tag = f'<div class="sol-tag">{sol_lbl}</div>' if sol_lbl else ''
+        # Find the matching solunar window to get its time
+        sol_time_str = ''
+        if sol_lbl:
+            for w in sol_by_day.get(rec['ds'], []):
+                diff = min(abs(float(rec['hour']) - w['hour_ct']), 24 - abs(float(rec['hour']) - w['hour_ct']))
+                if diff <= 1.0:
+                    sol_time_str = fmt12f(w['hour_ct'])
+                    break
+        sol_tag_text = f"{sol_lbl} · {sol_time_str}" if sol_lbl and sol_time_str else sol_lbl
+        sol_tag = f'<div class="sol-tag">{sol_tag_text}</div>' if sol_lbl else ''
         ec  = 'gv' if eff<7 else 'wv' if eff<12 else 'bv'
         # temp color: cold=blue-ish, warm=gold
         temp_col = ('#60a5fa' if rec['temp'] < 32 else
                     '#94a3b8' if rec['temp'] < 50 else
                     'var(--text)' if rec['temp'] < 70 else
                     'var(--warn)')
+        arrow = wind_arrow(rec['wind_dir'])
         notes_html = ' · '.join(
             f"<strong>{nn}</strong>" if '🦅' in nn or '🌕' in nn or '⚠️' in nn or '🚫' in nn else nn
             for nn in a['notes'] if not (sol_lbl and sol_lbl in nn and sol_tag))
@@ -814,9 +956,9 @@ def build_html(weather_json, haikubox_data=None):
           </div>
           <div class="pm">
             <div class="m"><div class="ml">Temp</div><div class="mv" style="color:{temp_col}">{rec['temp']}°F</div></div>
-            <div class="m"><div class="ml">Effective Wind</div><div class="mv {ec}">{eff} mph</div></div>
             <div class="m"><div class="ml">Cloud Cover</div><div class="mv {'gv' if rec['cloud']<40 else ''}">{rec['cloud']}%</div></div>
-            <div class="m"><div class="ml">Session Length</div><div class="mv {'gv' if sess_len>=3 else ''}">{sess_len}+ hr{'s' if sess_len!=1 else ''}</div></div>
+            <div class="m"><div class="ml">Wind {arrow} {dir_} </div><div class="mv">{rec['wind']} mph</div></div>
+            <div class="m"><div class="ml">Eff. Wind</div><div class="mv {ec}">{eff} mph</div></div>
           </div>
           {sol_tag}
           <div class="pick-notes">{notes_html}</div>
@@ -832,15 +974,45 @@ def build_html(weather_json, haikubox_data=None):
               <div class="blind-empty">No multi-hour sessions ≥50 found in forecast</div>
             </div>"""
         entries = ''
-        for ds, s in best_blind[:5]:
-            avg_w = round(sum(r['wind'] for r in s) / len(s))
+        shown = 0
+        for ds, s in best_blind[:10]:
             best_s = max(r['analysis']['score'] for r in s)
             sc_col = ('#a78bfa' if best_s>=75 and any(r['analysis']['is_prime'] for r in s)
                       else '#2ecc71' if best_s>=75 else 'var(--gold)')
+            # Count consecutive hours from start where effective wind stays ≤5 mph
+            low_wind_hrs = 0
+            for r in s:
+                eff_w, _, _, _ = wind_impact(r['wind'], r['wind_dir'])
+                if eff_w <= 5.0:
+                    low_wind_hrs += 1
+                else:
+                    break
+            # Only show windows with 8+ consecutive hours of eff wind ≤5 mph
+            if low_wind_hrs < 8:
+                continue
+            worth_tag = ''
+            if low_wind_hrs >= 48:
+                worth_tag = '<span style="color:#2ecc71;font-size:9px;margin-left:6px">✅ 2+ day window</span>'
+            elif low_wind_hrs >= 24:
+                worth_tag = '<span style="color:#2ecc71;font-size:9px;margin-left:6px">✅ Full day window</span>'
+            elif low_wind_hrs >= 12:
+                worth_tag = '<span style="color:#2ecc71;font-size:9px;margin-left:6px">✅ Worth setup</span>'
+            else:
+                worth_tag = f'<span style="color:var(--gold);font-size:9px;margin-left:6px">⚠️ {low_wind_hrs}h calm window</span>'
             entries += f"""<div class="blind-entry">
               <div class="blind-day">{fmt_date(ds)}</div>
-              <div class="blind-window">{fmt12(s[0]['hour'])} – {fmt12(s[-1]['hour']+1)}</div>
-              <div class="blind-meta">{len(s)} consecutive hrs · Avg wind {avg_w} mph · Best <span style="color:{sc_col}">{best_s}/100</span></div>
+              <div class="blind-window">Setup by {fmt12(s[0]['hour'])}</div>
+              <div class="blind-meta">
+                Eff. wind ≤5 mph for <span style="color:{sc_col};font-weight:600">{low_wind_hrs} hr{'s' if low_wind_hrs!=1 else ''}</span>{worth_tag}
+              </div>
+            </div>"""
+            shown += 1
+            if shown >= 5:
+                break
+        if not entries:
+            return f"""<div class="blind-sidebar">
+              <h3>🎭 Blind Setup Windows</h3>
+              <div class="blind-empty">No windows with 8+ consecutive hours of calm wind in forecast</div>
             </div>"""
         return f"""<div class="blind-sidebar">
           <h3>🎭 Blind Setup Windows</h3>
@@ -901,15 +1073,10 @@ def build_html(weather_json, haikubox_data=None):
         eagle_pill = f'<span class="pill" style="background:rgba(142,68,173,.15);color:#9b59b6">🦅 Eagle watch</span>' if has_eagle else ''
         blind_pill = f'<span class="pill" style="background:rgba(39,174,96,.1);color:#2ecc71">🎭 {len(ext)} extended session{"s" if len(ext)>1 else ""}</span>' if ext else ''
 
-        sol_parts = [('🌕 ' if w['type']=='major' else '🌙 ') + fmt12f(w['hour_ct']) for w in sol_day]
+        sol_parts = [('🌕 ' if w['type']=='major' else '🌙 ') + w['label'] + ' · ' + fmt12f(w['hour_ct']) for w in sol_day]
         sol_pill  = (f'<span class="pill" style="background:var(--prime-bg);color:var(--prime)">'
                      f'{" · ".join(sol_parts)}</span>') if sol_parts else ''
 
-        blind_banners = ''.join(
-            f'<div class="blind-banner">🎭 <strong>Blind Setup Window:</strong> '
-            f'{fmt12(s[0]["hour"])} – {fmt12(s[-1]["hour"]+1)} · '
-            f'{len(s)} consecutive hrs ≥50 · Avg wind {round(sum(r["wind"] for r in s)/len(s))} mph</div>'
-            for s in ext)
         sol_banner = (f'<div class="sol-banner">🌕 Solunar windows: '
                       f'{" &nbsp;·&nbsp; ".join(sol_parts)}</div>') if sol_parts else ''
 
@@ -921,14 +1088,14 @@ def build_html(weather_json, haikubox_data=None):
             <div><div class="day-name">{dow}</div><div class="day-sub">{fmt_date_short(ds)}</div></div>
             <div class="day-sum">
               <span class="pill" style="background:{pb};color:{pc}">Best: {best}/100</span>
-              {sun_pill}{sol_pill}
+              {sun_pill}
               <span class="pill" style="background:rgba(143,163,177,.1);color:var(--sub)">Avg wind: {avg_wind} mph</span>
               {prime_pill}{eagle_pill}{blind_pill}
             </div>
             <div class="dexp">▾</div>
           </div>
           <div class="day-content">
-            {sol_banner}{blind_banners}
+            {sol_banner}
             <div class="hr-header"><span>Time</span><span>Score</span><span>Temp</span><span>Eff. Wind</span>
               <span>Direction</span><span>Clouds</span><span>Notes</span></div>
             {rows}
@@ -940,7 +1107,7 @@ def build_html(weather_json, haikubox_data=None):
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
-<title>Lake Koshkonong Bird Photography Planner v3</title>
+<title>Lake Koshkonong Bird Photography Planner v5</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Source+Code+Pro:wght@300;400;500&display=swap" rel="stylesheet">
 <style>{css}</style>
 </head>
@@ -948,7 +1115,7 @@ def build_html(weather_json, haikubox_data=None):
 <div class="sky-bg"></div>
 <div class="content">
   <header>
-    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v3.0</div>
+    <div class="loc-badge">📍 Lake Koshkonong · Fort Atkinson WI · West-Facing Deck · v5.0</div>
     <h1>Bird Photography<br><em>Session Planner</em></h1>
     <p class="subtitle">7-Day Forecast · Wind · Light · Solunar Tables · Eagle · Haikubox Live</p>
     <div class="legend">
@@ -970,15 +1137,17 @@ def build_html(weather_json, haikubox_data=None):
   </div>
   <div class="sl">Haikubox · Lake Koshkonong</div>
   {haikubox_html}
+  <div class="sl" style="margin-top:16px">eBird · Jefferson County sightings</div>
+  {ebird_html}
   <div class="sl" style="margin-top:16px">7-day hourly forecast</div>
   {days_html}
   <div class="sl" style="margin-top:40px">Scoring guide</div>
   <div class="kg">
-    <div class="kc"><h4>What's New in v3.0</h4><ul>
-      <li>🧭 West-wind penalty: pure W &lt;5 mph OK; 5–10 mph −15 pts; &gt;10 mph capped at 50 (no GOOD/EXCELLENT)</li>
-      <li>🌡️ Temperature now shown in pick cards and hourly forecast</li>
-      <li>🎭 Blind Setup Windows moved up top alongside Best Sessions</li>
-      <li>Solunar + golden hour prime sessions suppressed under strong W wind</li>
+    <div class="kc"><h4>What's New in v5.0</h4><ul>
+      <li>🔭 eBird recent sightings added — Jefferson County WI, last 7 days, filtered against Haikubox species</li>
+      <li>🎭 Blind Setup Windows now only shown when 8+ consecutive hours of eff. wind ≤5 mph</li>
+      <li>📅 7-day forecast headers cleaned up — solunar info removed (available in hourly detail)</li>
+      <li>Previous: Session Length replaced by Actual Wind + Effective Wind in pick cards</li>
     </ul></div>
     <div class="kc"><h4>Wind Logic</h4><ul>
       <li>Deck faces west over Lake Koshkonong</li>
@@ -1004,8 +1173,8 @@ def build_html(weather_json, haikubox_data=None):
     </ul></div>
   </div>
   <footer>
-    Data: Open-Meteo · Haikubox (Lake Koshkonong) · Solunar tables computed in Python<br>
-    {LAT}°N, {abs(LNG):.4f}°W · Lake Koshkonong, Fort Atkinson WI · v3.0
+    Data: Open-Meteo · Haikubox (Lake Koshkonong) · eBird (Jefferson County WI) · Solunar tables computed in Python<br>
+    {LAT}°N, {abs(LNG):.4f}°W · Lake Koshkonong, Fort Atkinson WI · v5.0
   </footer>
 </div>
 <script>
@@ -1022,7 +1191,7 @@ document.querySelector('.day-header')?.click();
 def main():
     import os
     print("=" * 60)
-    print("  Lake Koshkonong Bird Photography Planner  v3.0")
+    print("  Lake Koshkonong Bird Photography Planner  v5.0")
     print("=" * 60)
     export_mode = '--export' in sys.argv
 
@@ -1045,8 +1214,15 @@ def main():
     else:
         print("  ⚠️  Haikubox unavailable — planner will work without it")
 
+    print("\n[2.5/3] Fetching eBird recent sightings for Jefferson County WI...")
+    eb = fetch_ebird(days=7, max_results=100)
+    if eb:
+        print(f"  ✅ {len(eb)} recent eBird observations fetched")
+    else:
+        print("  ⚠️  eBird unavailable — check API key or internet connection")
+
     print("\n[3/3] Building planner + computing solunar tables...")
-    html       = build_html(weather, hb)
+    html       = build_html(weather, hb, eb)
     html_bytes = html.encode('utf-8')
 
     script_dir = os.path.dirname(os.path.abspath(__file__))
